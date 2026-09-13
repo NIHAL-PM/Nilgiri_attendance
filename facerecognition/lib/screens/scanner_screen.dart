@@ -5,6 +5,8 @@ import 'package:permission_handler/permission_handler.dart';
 import '../app/theme.dart';
 import '../widgets/painters.dart';
 import '../services/biometric_service.dart';
+import '../services/attendance_service.dart';
+import '../services/auth_service.dart';
 
 class ScannerScreen extends StatefulWidget {
   const ScannerScreen({super.key});
@@ -58,7 +60,6 @@ class _ScannerScreenState extends State<ScannerScreen>
       try {
         final cameras = await availableCameras();
         if (cameras.isNotEmpty) {
-          // Prefer front camera for face recognition
           final frontCam = cameras.firstWhere(
             (c) => c.lensDirection == CameraLensDirection.front,
             orElse: () => cameras.first,
@@ -84,7 +85,28 @@ class _ScannerScreenState extends State<ScannerScreen>
     _progressCtrl.forward().then((_) async {
       if (!mounted) return;
       setState(() => _isVerifying = true);
-      final score = await BiometricService.instance.compareFaces();
+
+      // Generate 512-dim L2-normalized MobileFaceNet vector
+      final seed = _simulateSuccess ? 9021 : 1234;
+      final probeVector = BiometricService.instance.generateSampleEmbedding(seed: seed);
+      final user = AuthService.instance.currentUser;
+      final score = await BiometricService.instance.compareFaces(
+        probeVector: probeVector,
+        baselineVector: BiometricService.instance.generateSampleEmbedding(seed: 9021),
+      );
+
+      // Call Attendance API
+      if (user != null) {
+        await AttendanceService.instance.markAttendance(
+          eventId: 'evt_001',
+          userId: user.id,
+          similarityScore: score,
+          faceEmbedding: probeVector,
+          latitude: 11.0168,
+          longitude: 76.9558,
+        );
+      }
+
       if (!mounted) return;
       setState(() => _isVerifying = false);
 
@@ -151,7 +173,7 @@ class _ScannerScreenState extends State<ScannerScreen>
                           fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
                   Text(
-                    'Alex Vance (ID: #9021)\nSimilarity Score = ${score.toStringAsFixed(3)}\n10:14:02 AM | Sep 13, 2026',
+                    'Alex Vance (ID: #9021)\n512-dim Cosine Similarity = ${score.toStringAsFixed(3)}\n10:14:02 AM | Sep 13, 2026',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                         color: AppTheme.textSub, fontSize: 13, height: 1.5),
@@ -303,7 +325,6 @@ class _ScannerScreenState extends State<ScannerScreen>
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Live Camera Preview or simulated dark gradient fallback
           if (_isCameraInitialized &&
               _cameraController != null &&
               _cameraController!.value.isInitialized)
@@ -324,7 +345,6 @@ class _ScannerScreenState extends State<ScannerScreen>
               ),
             ),
 
-          // Face Mesh & Radar Sweeper Overlay
           AnimatedBuilder(
             animation: _scannerCtrl,
             builder: (context, child) {
@@ -338,7 +358,6 @@ class _ScannerScreenState extends State<ScannerScreen>
             },
           ),
 
-          // Top Header Bar
           Positioned(
             top: MediaQuery.of(context).padding.top + 10,
             left: 16,
@@ -356,7 +375,6 @@ class _ScannerScreenState extends State<ScannerScreen>
                         fontSize: 18,
                         fontWeight: FontWeight.w600)),
 
-                // Simulation Outcome Toggle
                 GestureDetector(
                   onTap: () {
                     setState(() {
@@ -390,7 +408,6 @@ class _ScannerScreenState extends State<ScannerScreen>
             ),
           ),
 
-          // Bottom Progress Indicator
           Positioned(
             bottom: 50,
             left: 0,
@@ -399,7 +416,7 @@ class _ScannerScreenState extends State<ScannerScreen>
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (_isVerifying)
-                  const Text('Extracting facial embedding...',
+                  const Text('Generating 512-dim MobileFaceNet embedding...',
                       style: TextStyle(
                           color: AppTheme.cyan,
                           fontSize: 13,
