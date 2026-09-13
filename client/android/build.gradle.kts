@@ -3,21 +3,9 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-
 // Align JVM target compatibility between Java and Kotlin tasks across ALL
-// subprojects, unconditionally. Modern Kotlin Gradle Plugin rejects mixed
-// Java/Kotlin targets. Per-project overrides (e.g. keying off project.name)
-// are fragile because some plugins — tflite_flutter included — set
-// kotlinOptions.jvmTarget inside their own module build.gradle, and that can
-// win over a conditional root-level setting depending on configuration
-// ordering. Forcing one target everywhere, with no exceptions, avoids that
-// class of mismatch entirely.
+// subprojects unconditionally. Modern Kotlin Gradle Plugin rejects mixed
+// Java/Kotlin targets. Using afterEvaluate so it runs after plugin defaults.
 subprojects {
     afterEvaluate {
         tasks.withType<JavaCompile>().configureEach {
@@ -40,9 +28,6 @@ rootProject.layout.buildDirectory.value(newBuildDir)
 subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
-}
-subprojects {
-    project.evaluationDependsOn(":app")
 }
 
 tasks.register<Delete>("clean") {
