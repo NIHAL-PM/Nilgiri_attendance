@@ -6,6 +6,8 @@ class UserRead(BaseModel):
     email: EmailStr
     avatar_url: str
     role: str
+    class_name: str | None = "CS-2026"
+    totp_enabled: bool = False
     is_verified: bool
     accuracy_score: float
     total_events: int
@@ -15,4 +17,4 @@ class UserRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class UserBaselineUpload(BaseModel):
-    embedding_vector: list[float]  # 512-dim array from MobileFaceNet
+    embedding_vector: list[float]

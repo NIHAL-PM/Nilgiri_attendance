@@ -6,6 +6,8 @@ import '../widgets/painters.dart';
 import '../services/auth_service.dart';
 import 'login_screen.dart';
 import 'registration_screen.dart';
+import 'teacher_screen.dart';
+import 'admin_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final User user;
@@ -207,6 +209,55 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             const SliverToBoxAdapter(child: SizedBox(height: AppTheme.spaceLg)),
 
+            // Management Portals Section (Teacher & Admin Portals)
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg),
+              sliver: SliverToBoxAdapter(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppTheme.bgSurface,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+                    border: Border.all(color: AppTheme.border),
+                  ),
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.school, color: AppTheme.gold),
+                        title: const Text('Teacher Event & Roster Portal',
+                            style: TextStyle(color: AppTheme.textPrimary, fontSize: 14)),
+                        subtitle: const Text('Manage class events & view attendance roster',
+                            style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
+                        trailing: const Icon(Icons.arrow_forward_ios, color: AppTheme.textMuted, size: 14),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => TeacherScreen(user: u)),
+                          );
+                        },
+                      ),
+                      const Divider(height: 1, color: AppTheme.border),
+                      ListTile(
+                        leading: const Icon(Icons.security, color: AppTheme.red),
+                        title: const Text('Admin System & User Control Panel',
+                            style: TextStyle(color: AppTheme.textPrimary, fontSize: 14)),
+                        subtitle: const Text('Mandatory 2FA TOTP • User Creation & Audit',
+                            style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
+                        trailing: const Icon(Icons.arrow_forward_ios, color: AppTheme.textMuted, size: 14),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const AdminScreen()),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            const SliverToBoxAdapter(child: SizedBox(height: AppTheme.spaceLg)),
+
             // Settings & Actions Section
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg),
@@ -222,53 +273,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ListTile(
                         leading: const Icon(Icons.face, color: AppTheme.cyan),
                         title: const Text('Re-register Biometric Baseline',
-                            style: TextStyle(
-                                color: AppTheme.textPrimary, fontSize: 14)),
-                        trailing: const Icon(Icons.arrow_forward_ios,
-                            color: AppTheme.textMuted, size: 14),
+                            style: TextStyle(color: AppTheme.textPrimary, fontSize: 14)),
+                        trailing: const Icon(Icons.arrow_forward_ios, color: AppTheme.textMuted, size: 14),
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                                builder: (_) => const RegistrationScreen()),
+                            MaterialPageRoute(builder: (_) => const RegistrationScreen()),
                           );
                         },
                       ),
                       const Divider(height: 1, color: AppTheme.border),
                       SwitchListTile(
                         activeColor: AppTheme.cyan,
-                        secondary: const Icon(Icons.fingerprint,
-                            color: AppTheme.green),
+                        secondary: const Icon(Icons.fingerprint, color: AppTheme.green),
                         title: const Text('Require Biometrics on Launch',
-                            style: TextStyle(
-                                color: AppTheme.textPrimary, fontSize: 14)),
+                            style: TextStyle(color: AppTheme.textPrimary, fontSize: 14)),
                         value: _biometricsEnabled,
-                        onChanged: (v) =>
-                            setState(() => _biometricsEnabled = v),
+                        onChanged: (v) => setState(() => _biometricsEnabled = v),
                       ),
                       const Divider(height: 1, color: AppTheme.border),
                       SwitchListTile(
                         activeColor: AppTheme.cyan,
-                        secondary: const Icon(Icons.notifications_outlined,
-                            color: AppTheme.gold),
+                        secondary: const Icon(Icons.notifications_outlined, color: AppTheme.gold),
                         title: const Text('Event Reminders & Alerts',
-                            style: TextStyle(
-                                color: AppTheme.textPrimary, fontSize: 14)),
+                            style: TextStyle(color: AppTheme.textPrimary, fontSize: 14)),
                         value: _notificationsEnabled,
-                        onChanged: (v) =>
-                            setState(() => _notificationsEnabled = v),
+                        onChanged: (v) => setState(() => _notificationsEnabled = v),
                       ),
                       const Divider(height: 1, color: AppTheme.border),
                       SwitchListTile(
                         activeColor: AppTheme.cyan,
-                        secondary: const Icon(Icons.location_on_outlined,
-                            color: AppTheme.blue),
+                        secondary: const Icon(Icons.location_on_outlined, color: AppTheme.blue),
                         title: const Text('Automated Geofence Checks',
-                            style: TextStyle(
-                                color: AppTheme.textPrimary, fontSize: 14)),
+                            style: TextStyle(color: AppTheme.textPrimary, fontSize: 14)),
                         value: _locationTracking,
-                        onChanged: (v) =>
-                            setState(() => _locationTracking = v),
+                        onChanged: (v) => setState(() => _locationTracking = v),
                       ),
                     ],
                   ),
@@ -298,19 +337,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     decoration: BoxDecoration(
                       color: AppTheme.red.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-                      border: Border.all(
-                          color: AppTheme.red.withValues(alpha: 0.4)),
+                      border: Border.all(color: AppTheme.red.withValues(alpha: 0.4)),
                     ),
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.logout, color: AppTheme.red, size: 18),
                         SizedBox(width: 8),
-                        Text('Sign Out',
-                            style: TextStyle(
-                                color: AppTheme.red,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14)),
+                        Text('Sign Out', style: TextStyle(color: AppTheme.red, fontWeight: FontWeight.bold, fontSize: 14)),
                       ],
                     ),
                   ),

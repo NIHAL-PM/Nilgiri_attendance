@@ -9,6 +9,8 @@ class EventRead(BaseModel):
     end_time: datetime
     is_active: bool
     image_tag: str
+    target_class: str = "All"
+    created_by_id: str | None = None
     latitude: float
     longitude: float
     radius_meters: float
@@ -22,6 +24,7 @@ class EventCreate(BaseModel):
     end_time: datetime
     is_active: bool = True
     image_tag: str = "cyan"
+    target_class: str = "All"
     latitude: float = 11.0168
     longitude: float = 76.9558
     radius_meters: float = 50.0

@@ -5,11 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from config import settings
 from database import init_db
-from routers import auth_router, users_router, events_router, attendance_router
+from routers import auth_router, users_router, events_router, attendance_router, admin_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Initialize Database Tables
+    # Startup: Initialize Database Tables & Seed Admin Account
     await init_db()
     yield
     # Shutdown
@@ -37,6 +37,7 @@ app.include_router(auth_router, prefix=settings.API_V1_STR)
 app.include_router(users_router, prefix=settings.API_V1_STR)
 app.include_router(events_router, prefix=settings.API_V1_STR)
 app.include_router(attendance_router, prefix=settings.API_V1_STR)
+app.include_router(admin_router, prefix=settings.API_V1_STR)
 
 @app.get("/", tags=["Health"])
 @app.get("/health", tags=["Health"])

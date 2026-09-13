@@ -5,6 +5,7 @@ import '../services/auth_service.dart';
 import '../widgets/gradient_button.dart';
 import 'dashboard_screen.dart';
 import 'registration_screen.dart';
+import 'password_reset_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -140,9 +141,12 @@ class _LoginScreenState extends State<LoginScreen>
 
                   Align(
                     alignment: Alignment.centerRight,
-                    child: Text('Forgot password?',
-                        style: TextStyle(color: AppTheme.cyan.withValues(alpha: 0.8),
-                            fontSize: 12, fontWeight: FontWeight.w600)),
+                    child: GestureDetector(
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PasswordResetScreen())),
+                      child: Text('Forgot password?',
+                          style: TextStyle(color: AppTheme.cyan.withValues(alpha: 0.8),
+                              fontSize: 12, fontWeight: FontWeight.w600)),
+                    ),
                   ),
                   const SizedBox(height: 22),
 

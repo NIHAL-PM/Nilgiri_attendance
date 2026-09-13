@@ -17,6 +17,17 @@ class User(Base):
     # Role-Based Access Control: 'student' (default), 'teacher', 'admin'
     role: Mapped[str] = mapped_column(String(50), default="student", nullable=False)
     
+    # Class Cohort (e.g. 'CS-2026', 'ECE-A')
+    class_name: Mapped[str | None] = mapped_column(String(100), default="CS-2026", nullable=True)
+    
+    # 2FA TOTP (Google Authenticator)
+    totp_secret: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    totp_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
+    
+    # Password Reset
+    reset_token: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    reset_token_expires: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    
     # Biometric Enrollment
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False)
     face_embedding_json: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON-encoded 512 float array

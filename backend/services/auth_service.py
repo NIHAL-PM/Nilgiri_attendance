@@ -1,7 +1,12 @@
+import secrets
 from datetime import datetime, timedelta, timezone
 import jwt
 from passlib.context import CryptContext
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from config import settings
+from database import AsyncSessionLocal
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -32,3 +37,30 @@ class AuthService:
             return payload
         except jwt.PyJWTError:
             return None
+
+    @staticmethod
+    def generate_reset_token() -> tuple[str, datetime]:
+        """Generates a secure random 32-byte hexadecimal token valid for 1 hour"""
+        token = secrets.token_hex(32)
+        expires = datetime.utcnow() + timedelta(hours=1)
+        return token, expires
+
+    @staticmethod
+    async def seed_initial_admin():
+        """Seeds default initial Admin: admin@nilgiricollege.ac.in / nuamansir123"""
+        from models.user import User
+        async with AsyncSessionLocal() as db:
+            result = await db.execute(select(User).where(User.email == "admin@nilgiricollege.ac.in"))
+            admin = result.scalar_one_or_none()
+            if not admin:
+                hashed_pwd = AuthService.get_password_hash("nuamansir123")
+                admin = User(
+                    email="admin@nilgiricollege.ac.in",
+                    name="System Administrator (Nuaman Sir)",
+                    hashed_password=hashed_pwd,
+                    role="admin",
+                    class_name="Admin",
+                    is_verified=True,
+                )
+                db.add(admin)
+                await db.commit()
