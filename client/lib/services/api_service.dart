@@ -1,14 +1,14 @@
-﻿import 'package:dio/dio.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../models/app_models.dart';
 
 class ApiService {
   // Use 10.0.2.2 for Android Emulator, localhost for iOS/desktop simulator
   static const String defaultBaseUrl = 'http://10.0.2.2:8000/api/v1';
-  
+
   late final Dio _dio;
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
-  
+
   static const String tokenKey = 'jwt_auth_token';
 
   ApiService({String baseUrl = defaultBaseUrl}) {

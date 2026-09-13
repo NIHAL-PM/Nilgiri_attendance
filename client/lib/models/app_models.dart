@@ -1,4 +1,4 @@
-﻿class UserModel {
+class UserModel {
   final String id;
   final String email;
   final String studentId;
@@ -25,21 +25,21 @@
       fullName: json['full_name'] ?? '',
       role: json['role'] ?? 'student',
       isFaceRegistered: json['is_face_registered'] ?? false,
-      faceRegisteredAt: json['face_registered_at'] != null 
-          ? DateTime.tryParse(json['face_registered_at']) 
+      faceRegisteredAt: json['face_registered_at'] != null
+          ? DateTime.tryParse(json['face_registered_at'])
           : null,
     );
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'email': email,
-    'student_id': studentId,
-    'full_name': fullName,
-    'role': role,
-    'is_face_registered': isFaceRegistered,
-    'face_registered_at': faceRegisteredAt?.toIso8601String(),
-  };
+        'id': id,
+        'email': email,
+        'student_id': studentId,
+        'full_name': fullName,
+        'role': role,
+        'is_face_registered': isFaceRegistered,
+        'face_registered_at': faceRegisteredAt?.toIso8601String(),
+      };
 }
 
 class EventModel {
@@ -78,8 +78,12 @@ class EventModel {
       name: json['name'] ?? '',
       description: json['description'],
       locationName: json['location_name'] ?? 'Auditorium',
-      latitude: json['latitude'] != null ? (json['latitude'] as num).toDouble() : null,
-      longitude: json['longitude'] != null ? (json['longitude'] as num).toDouble() : null,
+      latitude: json['latitude'] != null
+          ? (json['latitude'] as num).toDouble()
+          : null,
+      longitude: json['longitude'] != null
+          ? (json['longitude'] as num).toDouble()
+          : null,
       radiusMeters: (json['radius_meters'] as num?)?.toDouble() ?? 50.0,
       isGeofenced: json['is_geofenced'] ?? false,
       startTime: DateTime.parse(json['start_time']),
@@ -114,7 +118,9 @@ class AttendanceVerifyResult {
       studentName: json['student_name'] ?? '',
       similarityScore: (json['similarity_score'] as num?)?.toDouble() ?? 0.0,
       message: json['message'] ?? '',
-      timestamp: json['timestamp'] != null ? DateTime.parse(json['timestamp']) : DateTime.now(),
+      timestamp: json['timestamp'] != null
+          ? DateTime.parse(json['timestamp'])
+          : DateTime.now(),
       geofenceVerified: json['geofence_verified'] ?? true,
       attendanceId: json['attendance_id'],
     );

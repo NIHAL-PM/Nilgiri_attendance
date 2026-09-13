@@ -1,5 +1,4 @@
-﻿import 'dart:math';
-import 'dart:typed_data';
+import 'dart:math';
 import 'package:image/image.dart' as img;
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
@@ -7,7 +6,8 @@ import 'package:tflite_flutter/tflite_flutter.dart';
 class BiometricEmbeddingService {
   Interpreter? _interpreter;
   bool _isModelLoaded = false;
-  static const int inputSize = 112; // MobileFaceNet standard input dimension 112x112
+  static const int inputSize =
+      112; // MobileFaceNet standard input dimension 112x112
   static const int embeddingDim = 512; // 512-float vector
 
   bool get isModelLoaded => _isModelLoaded;
@@ -15,7 +15,9 @@ class BiometricEmbeddingService {
   Future<void> loadModel() async {
     try {
       final options = InterpreterOptions()..threads = 2;
-      _interpreter = await Interpreter.fromAsset('assets/models/mobile_facenet.tflite', options: options);
+      _interpreter = await Interpreter.fromAsset(
+          'assets/models/mobile_facenet.tflite',
+          options: options);
       _isModelLoaded = true;
     } catch (e) {
       // Model asset not packaged yet; use deterministic mathematical stand-in for development
@@ -36,7 +38,8 @@ class BiometricEmbeddingService {
     final int h = min(cameraImage.height - y, rect.height.toInt());
 
     final cropped = img.copyCrop(cameraImage, x: x, y: y, width: w, height: h);
-    final resized = img.copyResize(cropped, width: inputSize, height: inputSize);
+    final resized =
+        img.copyResize(cropped, width: inputSize, height: inputSize);
 
     if (_interpreter != null && _isModelLoaded) {
       // 2. Normalize RGB pixels to [-1.0, 1.0] as expected by MobileFaceNet
@@ -81,12 +84,11 @@ class BiometricEmbeddingService {
 
   List<double> _generateFeatureVectorFromFace(Face face, img.Image resized) {
     // Deterministically synthesizes a stable 512-dim unit vector
-    final random = Random(
-      (face.boundingBox.width.toInt() * 31) ^ 
-      (face.boundingBox.height.toInt() * 17) ^ 
-      ((face.headEulerAngleY ?? 0.0).toInt())
-    );
-    final list = List<double>.generate(embeddingDim, (_) => (random.nextDouble() * 2.0) - 1.0);
+    final random = Random((face.boundingBox.width.toInt() * 31) ^
+        (face.boundingBox.height.toInt() * 17) ^
+        ((face.headEulerAngleY ?? 0.0).toInt()));
+    final list = List<double>.generate(
+        embeddingDim, (_) => (random.nextDouble() * 2.0) - 1.0);
     return _l2Normalize(list);
   }
 

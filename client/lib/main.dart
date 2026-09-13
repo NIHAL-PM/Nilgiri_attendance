@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'screens/login_screen.dart';
 import 'services/api_service.dart';
@@ -15,7 +15,7 @@ void main() {
 }
 
 class PulseAttendApp extends StatelessWidget {
-  const PulseAttendApp({Key? key}) : super(key: key);
+  const PulseAttendApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,6 @@ class PulseAttendApp extends StatelessWidget {
           primary: Color(0xFF00F2FE),
           secondary: Color(0xFF05FFA1),
           surface: Color(0xFF131A2A),
-          background: Color(0xFF0B0F19),
           error: Color(0xFFFF4B6E),
         ),
         fontFamily: 'Roboto',

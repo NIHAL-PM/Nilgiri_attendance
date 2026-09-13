@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../models/app_models.dart';
 
 class AttendanceResultDialog extends StatelessWidget {
@@ -6,15 +6,16 @@ class AttendanceResultDialog extends StatelessWidget {
   final VoidCallback onDismiss;
 
   const AttendanceResultDialog({
-    Key? key,
+    super.key,
     required this.result,
     required this.onDismiss,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     final bool isSuccess = result.status == 'verified';
-    final Color primaryColor = isSuccess ? const Color(0xFF05FFA1) : const Color(0xFFFF4B6E);
+    final Color primaryColor =
+        isSuccess ? const Color(0xFF05FFA1) : const Color(0xFFFF4B6E);
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -24,10 +25,11 @@ class AttendanceResultDialog extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF131A2A),
           borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: primaryColor.withOpacity(0.4), width: 1.5),
+          border: Border.all(
+              color: primaryColor.withValues(alpha: 0.4), width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: primaryColor.withOpacity(0.15),
+              color: primaryColor.withValues(alpha: 0.15),
               blurRadius: 30,
               spreadRadius: 2,
             ),
@@ -42,7 +44,7 @@ class AttendanceResultDialog extends StatelessWidget {
               height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: primaryColor.withOpacity(0.12),
+                color: primaryColor.withValues(alpha: 0.12),
                 border: Border.all(color: primaryColor, width: 2),
               ),
               child: Icon(
@@ -70,7 +72,7 @@ class AttendanceResultDialog extends StatelessWidget {
               result.message,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 fontSize: 14,
                 height: 1.4,
               ),
@@ -83,7 +85,7 @@ class AttendanceResultDialog extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFF0B0F19),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.08)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -94,7 +96,7 @@ class AttendanceResultDialog extends StatelessWidget {
                       Text(
                         'Cosine Match Score',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.5),
+                          color: Colors.white.withValues(alpha: 0.5),
                           fontSize: 12,
                         ),
                       ),
@@ -110,9 +112,10 @@ class AttendanceResultDialog extends StatelessWidget {
                     ],
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.15),
+                      color: primaryColor.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(

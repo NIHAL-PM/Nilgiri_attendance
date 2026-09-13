@@ -1,8 +1,6 @@
-﻿import 'dart:math';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
-import 'package:image/image.dart' as img;
 
 import '../models/app_models.dart';
 import '../services/api_service.dart';
@@ -16,10 +14,10 @@ class FaceRegistrationScreen extends StatefulWidget {
   final UserModel user;
 
   const FaceRegistrationScreen({
-    Key? key,
+    super.key,
     required this.apiService,
     required this.user,
-  }) : super(key: key);
+  });
 
   @override
   State<FaceRegistrationScreen> createState() => _FaceRegistrationScreenState();
@@ -28,7 +26,8 @@ class FaceRegistrationScreen extends StatefulWidget {
 class _FaceRegistrationScreenState extends State<FaceRegistrationScreen> {
   CameraController? _cameraController;
   final LivenessDetector _livenessDetector = LivenessDetector();
-  final BiometricEmbeddingService _biometricService = BiometricEmbeddingService();
+  final BiometricEmbeddingService _biometricService =
+      BiometricEmbeddingService();
 
   bool _isCameraInitialized = false;
   bool _isProcessing = false;
@@ -87,13 +86,16 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen> {
           await Future.delayed(const Duration(milliseconds: 1200));
           setState(() {
             _isLivenessPassed = true;
-            _guidanceMessage = "Liveness verified! Registering master biometric...";
+            _guidanceMessage =
+                "Liveness verified! Registering master biometric...";
           });
 
           // Generate 512-dim master embedding
           final random = Random(widget.user.studentId.hashCode);
-          final masterEmbedding = List<double>.generate(512, (_) => (random.nextDouble() * 2) - 1.0);
-          final norm = sqrt(masterEmbedding.map((e) => e * e).reduce((a, b) => a + b));
+          final masterEmbedding = List<double>.generate(
+              512, (_) => (random.nextDouble() * 2) - 1.0);
+          final norm =
+              sqrt(masterEmbedding.map((e) => e * e).reduce((a, b) => a + b));
           final normalized = masterEmbedding.map((e) => e / norm).toList();
 
           await widget.apiService.registerBiometrics(normalized);
@@ -103,7 +105,8 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen> {
           _showRegistrationSuccess();
         }
       } catch (e) {
-        setState(() => _guidanceMessage = "Face detection error. Reposition camera.");
+        setState(() =>
+            _guidanceMessage = "Face detection error. Reposition camera.");
       } finally {
         _isProcessing = false;
       }
@@ -121,7 +124,8 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen> {
           children: [
             Icon(Icons.check_circle_rounded, color: Color(0xFF05FFA1)),
             SizedBox(width: 10),
-            Text('Biometrics Enrolled', style: TextStyle(color: Colors.white, fontSize: 18)),
+            Text('Biometrics Enrolled',
+                style: TextStyle(color: Colors.white, fontSize: 18)),
           ],
         ),
         content: const Text(
@@ -132,7 +136,8 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF05FFA1),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
             onPressed: () {
               Navigator.of(ctx).pop();
@@ -145,7 +150,9 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen> {
                 ),
               );
             },
-            child: const Text('Proceed to Dashboard', style: TextStyle(color: Color(0xFF0B0F19), fontWeight: FontWeight.bold)),
+            child: const Text('Proceed to Dashboard',
+                style: TextStyle(
+                    color: Color(0xFF0B0F19), fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -204,7 +211,10 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen> {
                   const SizedBox(width: 8),
                   const Text(
                     'Biometric Onboarding',
-                    style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700),
                   ),
                 ],
               ),
@@ -219,18 +229,24 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               decoration: BoxDecoration(
-                color: const Color(0xFF131A2A).withOpacity(0.92),
+                color: const Color(0xFF131A2A).withValues(alpha: 0.92),
                 borderRadius: BorderRadius.circular(18),
                 border: Border.all(
-                  color: _isLivenessPassed ? const Color(0xFF05FFA1) : const Color(0xFF00F2FE),
+                  color: _isLivenessPassed
+                      ? const Color(0xFF05FFA1)
+                      : const Color(0xFF00F2FE),
                   width: 1.5,
                 ),
               ),
               child: Row(
                 children: [
                   Icon(
-                    _isLivenessPassed ? Icons.verified_user : Icons.remove_red_eye_outlined,
-                    color: _isLivenessPassed ? const Color(0xFF05FFA1) : const Color(0xFF00F2FE),
+                    _isLivenessPassed
+                        ? Icons.verified_user
+                        : Icons.remove_red_eye_outlined,
+                    color: _isLivenessPassed
+                        ? const Color(0xFF05FFA1)
+                        : const Color(0xFF00F2FE),
                   ),
                   const SizedBox(width: 12),
                   Expanded(

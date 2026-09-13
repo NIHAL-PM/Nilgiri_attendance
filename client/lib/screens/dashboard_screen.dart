@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/app_models.dart';
 import '../services/api_service.dart';
@@ -10,10 +10,10 @@ class DashboardScreen extends StatefulWidget {
   final UserModel user;
 
   const DashboardScreen({
-    Key? key,
+    super.key,
     required this.apiService,
     required this.user,
-  }) : super(key: key);
+  });
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -53,11 +53,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             Text(
               widget.user.fullName,
-              style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold),
             ),
-            Text(
+            const Text(
               'ID:  • Verified Biometric',
-              style: const TextStyle(color: Color(0xFF05FFA1), fontSize: 12),
+              style: TextStyle(color: Color(0xFF05FFA1), fontSize: 12),
             ),
           ],
         ),
@@ -65,17 +68,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
           IconButton(
             icon: const Icon(Icons.logout, color: Colors.white70),
             onPressed: () async {
+              final navigator = Navigator.of(context);
               await widget.apiService.logout();
               if (!mounted) return;
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (_) => LoginScreen(apiService: widget.apiService)),
+              navigator.pushReplacement(
+                MaterialPageRoute(
+                    builder: (_) => LoginScreen(apiService: widget.apiService)),
               );
             },
           ),
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFF00F2FE)))
+          ? const Center(
+              child: CircularProgressIndicator(color: Color(0xFF00F2FE)))
           : RefreshIndicator(
               onRefresh: _fetchEvents,
               color: const Color(0xFF00F2FE),
@@ -92,7 +98,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         end: Alignment.bottomRight,
                       ),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFF00F2FE).withOpacity(0.3)),
+                      border: Border.all(
+                          color:
+                              const Color(0xFF00F2FE).withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       children: [
@@ -100,10 +108,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           width: 44,
                           height: 44,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF05FFA1).withOpacity(0.15),
+                            color:
+                                const Color(0xFF05FFA1).withValues(alpha: 0.15),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.shield_outlined, color: Color(0xFF05FFA1)),
+                          child: const Icon(Icons.shield_outlined,
+                              color: Color(0xFF05FFA1)),
                         ),
                         const SizedBox(width: 14),
                         const Expanded(
@@ -112,12 +122,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             children: [
                               Text(
                                 'On-Device Verification Active',
-                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14),
                               ),
                               SizedBox(height: 2),
                               Text(
                                 'MobileFaceNet 512-dim vector matching enabled. Zero photo uploads.',
-                                style: TextStyle(color: Colors.white60, fontSize: 11.5),
+                                style: TextStyle(
+                                    color: Colors.white60, fontSize: 11.5),
                               ),
                             ],
                           ),
@@ -142,10 +156,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Container(
                       padding: const EdgeInsets.all(32),
                       alignment: Alignment.center,
-                      child: const Text('No active events currently available.', style: TextStyle(color: Colors.white54)),
+                      child: const Text('No active events currently available.',
+                          style: TextStyle(color: Colors.white54)),
                     )
                   else
-                    ..._events.map((evt) => _buildEventCard(evt)).toList(),
+                    ..._events.map((evt) => _buildEventCard(evt)),
                 ],
               ),
             ),
@@ -160,7 +175,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFF131A2A),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withOpacity(0.08)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,66 +184,78 @@ class _DashboardScreenState extends State<DashboardScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00F2FE).withOpacity(0.15),
+                  color: const Color(0xFF00F2FE).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   event.code,
-                  style: const TextStyle(color: Color(0xFF00F2FE), fontSize: 11, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      color: Color(0xFF00F2FE),
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
               if (event.isGeofenced)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.15),
+                    color: Colors.orange.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Row(
                     children: [
-                      Icon(Icons.location_on, color: Colors.orangeAccent, size: 12),
+                      Icon(Icons.location_on,
+                          color: Colors.orangeAccent, size: 12),
                       SizedBox(width: 4),
-                      Text('GPS Geofenced', style: TextStyle(color: Colors.orangeAccent, fontSize: 10, fontWeight: FontWeight.bold)),
+                      Text('GPS Geofenced',
+                          style: TextStyle(
+                              color: Colors.orangeAccent,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),
             ],
           ),
           const SizedBox(height: 12),
-
           Text(
             event.name,
-            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
+            style: const TextStyle(
+                color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 6),
           Text(
             event.description ?? '',
-            style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13),
+            style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.6), fontSize: 13),
           ),
           const SizedBox(height: 16),
-
           Row(
             children: [
               const Icon(Icons.place_outlined, color: Colors.white54, size: 16),
               const SizedBox(width: 6),
-              Text(event.locationName, style: const TextStyle(color: Colors.white70, fontSize: 13)),
+              Text(event.locationName,
+                  style: const TextStyle(color: Colors.white70, fontSize: 13)),
               const SizedBox(width: 16),
               const Icon(Icons.access_time, color: Colors.white54, size: 16),
               const SizedBox(width: 6),
-              Text(dateFormat.format(event.startTime), style: const TextStyle(color: Colors.white70, fontSize: 13)),
+              Text(dateFormat.format(event.startTime),
+                  style: const TextStyle(color: Colors.white70, fontSize: 13)),
             ],
           ),
           const SizedBox(height: 20),
-
           SizedBox(
             width: double.infinity,
             height: 48,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF00F2FE),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
                 elevation: 0,
               ),
               onPressed: () {
@@ -245,11 +272,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.camera_alt_outlined, color: Color(0xFF0B0F19), size: 20),
+                  Icon(Icons.camera_alt_outlined,
+                      color: Color(0xFF0B0F19), size: 20),
                   SizedBox(width: 8),
                   Text(
                     'Mark Attendance (Face Scan)',
-                    style: TextStyle(color: Color(0xFF0B0F19), fontWeight: FontWeight.w700, fontSize: 15),
+                    style: TextStyle(
+                        color: Color(0xFF0B0F19),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15),
                   ),
                 ],
               ),

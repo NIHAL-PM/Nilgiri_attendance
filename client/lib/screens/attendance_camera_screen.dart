@@ -1,4 +1,4 @@
-﻿import 'dart:math';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:geolocator/geolocator.dart';
@@ -17,11 +17,11 @@ class AttendanceCameraScreen extends StatefulWidget {
   final UserModel user;
 
   const AttendanceCameraScreen({
-    Key? key,
+    super.key,
     required this.apiService,
     required this.event,
     required this.user,
-  }) : super(key: key);
+  });
 
   @override
   State<AttendanceCameraScreen> createState() => _AttendanceCameraScreenState();
@@ -29,7 +29,8 @@ class AttendanceCameraScreen extends StatefulWidget {
 
 class _AttendanceCameraScreenState extends State<AttendanceCameraScreen> {
   CameraController? _cameraController;
-  final BiometricEmbeddingService _biometricService = BiometricEmbeddingService();
+  final BiometricEmbeddingService _biometricService =
+      BiometricEmbeddingService();
   final LivenessDetector _livenessDetector = LivenessDetector();
 
   bool _isCameraInitialized = false;
@@ -79,13 +80,15 @@ class _AttendanceCameraScreenState extends State<AttendanceCameraScreen> {
         // Dynamic liveness challenge simulation
         await Future.delayed(const Duration(milliseconds: 1400));
         setState(() {
-          _statusPrompt = "Liveness challenge passed! Computing 512-dim vector...";
+          _statusPrompt =
+              "Liveness challenge passed! Computing 512-dim vector...";
           _livenessPassed = true;
         });
 
         // Generate live vector
         final random = Random(widget.user.studentId.hashCode);
-        final liveVector = List<double>.generate(512, (_) => (random.nextDouble() * 2) - 1.0);
+        final liveVector =
+            List<double>.generate(512, (_) => (random.nextDouble() * 2) - 1.0);
         // Slightly perturb to simulate natural minor variations matching > 75%
         for (int i = 0; i < 512; i++) {
           liveVector[i] += (Random().nextDouble() - 0.5) * 0.04;
@@ -110,7 +113,8 @@ class _AttendanceCameraScreenState extends State<AttendanceCameraScreen> {
             status: 'failed',
             studentName: widget.user.fullName,
             similarityScore: 0.54,
-            message: 'Verification Failed: Face does not match registered account.',
+            message:
+                'Verification Failed: Face does not match registered account.',
             timestamp: DateTime.now(),
             geofenceVerified: true,
           ),
@@ -148,7 +152,8 @@ class _AttendanceCameraScreenState extends State<AttendanceCameraScreen> {
     if (!_isCameraInitialized || _cameraController == null) {
       return const Scaffold(
         backgroundColor: Color(0xFF0B0F19),
-        body: Center(child: CircularProgressIndicator(color: Color(0xFF00F2FE))),
+        body:
+            Center(child: CircularProgressIndicator(color: Color(0xFF00F2FE))),
       );
     }
 
@@ -180,19 +185,24 @@ class _AttendanceCameraScreenState extends State<AttendanceCameraScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                    icon:
+                        const Icon(Icons.close, color: Colors.white, size: 28),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF131A2A).withOpacity(0.85),
+                      color: const Color(0xFF131A2A).withValues(alpha: 0.85),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: Colors.white12),
                     ),
                     child: Text(
                       widget.event.name,
-                      style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
                   const SizedBox(width: 48), // Balance close button
@@ -209,15 +219,20 @@ class _AttendanceCameraScreenState extends State<AttendanceCameraScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               decoration: BoxDecoration(
-                color: const Color(0xFF131A2A).withOpacity(0.92),
+                color: const Color(0xFF131A2A).withValues(alpha: 0.92),
                 borderRadius: BorderRadius.circular(18),
                 border: Border.all(
-                  color: _livenessPassed ? const Color(0xFF05FFA1) : const Color(0xFF00F2FE),
+                  color: _livenessPassed
+                      ? const Color(0xFF05FFA1)
+                      : const Color(0xFF00F2FE),
                   width: 1.5,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: (_livenessPassed ? const Color(0xFF05FFA1) : const Color(0xFF00F2FE)).withOpacity(0.2),
+                    color: (_livenessPassed
+                            ? const Color(0xFF05FFA1)
+                            : const Color(0xFF00F2FE))
+                        .withValues(alpha: 0.2),
                     blurRadius: 20,
                   ),
                 ],
@@ -226,13 +241,18 @@ class _AttendanceCameraScreenState extends State<AttendanceCameraScreen> {
                 children: [
                   Icon(
                     _livenessPassed ? Icons.check_circle_outline : Icons.radar,
-                    color: _livenessPassed ? const Color(0xFF05FFA1) : const Color(0xFF00F2FE),
+                    color: _livenessPassed
+                        ? const Color(0xFF05FFA1)
+                        : const Color(0xFF00F2FE),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
                     child: Text(
                       _statusPrompt,
-                      style: const TextStyle(color: Colors.white, fontSize: 13.5, fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],

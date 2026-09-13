@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../models/app_models.dart';
 import 'face_registration_screen.dart';
@@ -7,15 +7,17 @@ import 'dashboard_screen.dart';
 class LoginScreen extends StatefulWidget {
   final ApiService apiService;
 
-  const LoginScreen({Key? key, required this.apiService}) : super(key: key);
+  const LoginScreen({super.key, required this.apiService});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _idController = TextEditingController(text: 'student@nilgiri.edu');
-  final TextEditingController _passwordController = TextEditingController(text: 'Student@123');
+  final TextEditingController _idController =
+      TextEditingController(text: 'student@nilgiri.edu');
+  final TextEditingController _passwordController =
+      TextEditingController(text: 'Student@123');
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -55,7 +57,8 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Invalid credentials or connection error. Please verify.';
+        _errorMessage =
+            'Invalid credentials or connection error. Please verify.';
       });
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -78,9 +81,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF00F2FE).withOpacity(0.12),
+                    color: const Color(0xFF00F2FE).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFF00F2FE), width: 1.5),
+                    border:
+                        Border.all(color: const Color(0xFF00F2FE), width: 1.5),
                   ),
                   child: const Icon(
                     Icons.fingerprint_rounded,
@@ -103,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Text(
                   'Biometric on-device event verification portal',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.6),
+                    color: Colors.white.withValues(alpha: 0.6),
                     fontSize: 15,
                   ),
                 ),
@@ -113,18 +117,20 @@ class _LoginScreenState extends State<LoginScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFF4B6E).withOpacity(0.12),
+                      color: const Color(0xFFFF4B6E).withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: const Color(0xFFFF4B6E)),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.error_outline, color: Color(0xFFFF4B6E), size: 20),
+                        const Icon(Icons.error_outline,
+                            color: Color(0xFFFF4B6E), size: 20),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             _errorMessage!,
-                            style: const TextStyle(color: Color(0xFFFF4B6E), fontSize: 13),
+                            style: const TextStyle(
+                                color: Color(0xFFFF4B6E), fontSize: 13),
                           ),
                         ),
                       ],
@@ -136,7 +142,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Student Email or ID Field
                 const Text(
                   'STUDENT ID OR EMAIL',
-                  style: TextStyle(color: Colors.white60, fontSize: 12, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                      color: Colors.white60,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 8),
                 TextField(
@@ -144,17 +153,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     hintText: 'e.g. STU_9981 or student@nilgiri.edu',
-                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.25)),
+                    hintStyle:
+                        TextStyle(color: Colors.white.withValues(alpha: 0.25)),
                     filled: true,
                     fillColor: const Color(0xFF131A2A),
-                    prefixIcon: const Icon(Icons.person_outline, color: Color(0xFF00F2FE)),
+                    prefixIcon: const Icon(Icons.person_outline,
+                        color: Color(0xFF00F2FE)),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                      borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.1)),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
-                      borderSide: const BorderSide(color: Color(0xFF00F2FE), width: 1.5),
+                      borderSide: const BorderSide(
+                          color: Color(0xFF00F2FE), width: 1.5),
                     ),
                   ),
                 ),
@@ -163,7 +176,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Password Field
                 const Text(
                   'PASSWORD',
-                  style: TextStyle(color: Colors.white60, fontSize: 12, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                      color: Colors.white60,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 8),
                 TextField(
@@ -172,17 +188,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     hintText: 'Enter account password',
-                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.25)),
+                    hintStyle:
+                        TextStyle(color: Colors.white.withValues(alpha: 0.25)),
                     filled: true,
                     fillColor: const Color(0xFF131A2A),
-                    prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF00F2FE)),
+                    prefixIcon: const Icon(Icons.lock_outline,
+                        color: Color(0xFF00F2FE)),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                      borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.1)),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
-                      borderSide: const BorderSide(color: Color(0xFF00F2FE), width: 1.5),
+                      borderSide: const BorderSide(
+                          color: Color(0xFF00F2FE), width: 1.5),
                     ),
                   ),
                 ),
@@ -195,12 +215,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF00F2FE),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
                       elevation: 0,
                     ),
                     onPressed: _isLoading ? null : _handleLogin,
                     child: _isLoading
-                        ? const CircularProgressIndicator(color: Color(0xFF0B0F19))
+                        ? const CircularProgressIndicator(
+                            color: Color(0xFF0B0F19))
                         : const Text(
                             'Sign In',
                             style: TextStyle(

@@ -1,4 +1,4 @@
-﻿import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
+import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 
 enum LivenessChallenge {
   lookStraight,
@@ -28,11 +28,13 @@ class LivenessDetector {
   }
 
   /// Evaluates whether the detected face satisfies positioning and liveness challenge
-  LivenessEvaluation evaluateFace(List<Face> faces, LivenessChallenge challenge) {
+  LivenessEvaluation evaluateFace(
+      List<Face> faces, LivenessChallenge challenge) {
     if (faces.isEmpty) {
       return LivenessEvaluation(
         isValid: false,
-        message: 'No face detected. Please position your face inside the frame.',
+        message:
+            'No face detected. Please position your face inside the frame.',
       );
     }
     if (faces.length > 1) {

@@ -1,14 +1,14 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 class RadarScannerOverlay extends StatefulWidget {
   final String promptText;
   final bool isChallengePassed;
 
   const RadarScannerOverlay({
-    Key? key,
+    super.key,
     required this.promptText,
     this.isChallengePassed = false,
-  }) : super(key: key);
+  });
 
   @override
   State<RadarScannerOverlay> createState() => _RadarScannerOverlayState();
@@ -73,15 +73,18 @@ class _RadarPainter extends CustomPainter {
     final Path backgroundPath = Path()
       ..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
     final Path ovalPath = Path()..addOval(ovalRect);
-    final Path cutOut = Path.combine(PathOperation.difference, backgroundPath, ovalPath);
+    final Path cutOut =
+        Path.combine(PathOperation.difference, backgroundPath, ovalPath);
 
-    final Paint dimPaint = Paint()..color = Colors.black.withOpacity(0.65);
+    final Paint dimPaint = Paint()
+      ..color = Colors.black.withValues(alpha: 0.65);
     canvas.drawPath(cutOut, dimPaint);
 
     // Oval Border Frame
-    final Color strokeColor = isPassed ? const Color(0xFF05FFA1) : const Color(0xFF00F2FE);
+    final Color strokeColor =
+        isPassed ? const Color(0xFF05FFA1) : const Color(0xFF00F2FE);
     final Paint borderPaint = Paint()
-      ..color = strokeColor.withOpacity(0.8)
+      ..color = strokeColor.withValues(alpha: 0.8)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3.0;
     canvas.drawOval(ovalRect, borderPaint);
@@ -93,19 +96,27 @@ class _RadarPainter extends CustomPainter {
       ..strokeWidth = 4.5
       ..strokeCap = StrokeCap.round;
 
-    final double bracketLen = 30.0;
+    const double bracketLen = 30.0;
     // Top-left
-    canvas.drawLine(Offset(ovalRect.left, ovalRect.top + bracketLen), Offset(ovalRect.left, ovalRect.top), bracketPaint);
-    canvas.drawLine(Offset(ovalRect.left, ovalRect.top), Offset(ovalRect.left + bracketLen, ovalRect.top), bracketPaint);
+    canvas.drawLine(Offset(ovalRect.left, ovalRect.top + bracketLen),
+        Offset(ovalRect.left, ovalRect.top), bracketPaint);
+    canvas.drawLine(Offset(ovalRect.left, ovalRect.top),
+        Offset(ovalRect.left + bracketLen, ovalRect.top), bracketPaint);
     // Top-right
-    canvas.drawLine(Offset(ovalRect.right - bracketLen, ovalRect.top), Offset(ovalRect.right, ovalRect.top), bracketPaint);
-    canvas.drawLine(Offset(ovalRect.right, ovalRect.top), Offset(ovalRect.right, ovalRect.top + bracketLen), bracketPaint);
+    canvas.drawLine(Offset(ovalRect.right - bracketLen, ovalRect.top),
+        Offset(ovalRect.right, ovalRect.top), bracketPaint);
+    canvas.drawLine(Offset(ovalRect.right, ovalRect.top),
+        Offset(ovalRect.right, ovalRect.top + bracketLen), bracketPaint);
     // Bottom-left
-    canvas.drawLine(Offset(ovalRect.left, ovalRect.bottom - bracketLen), Offset(ovalRect.left, ovalRect.bottom), bracketPaint);
-    canvas.drawLine(Offset(ovalRect.left, ovalRect.bottom), Offset(ovalRect.left + bracketLen, ovalRect.bottom), bracketPaint);
+    canvas.drawLine(Offset(ovalRect.left, ovalRect.bottom - bracketLen),
+        Offset(ovalRect.left, ovalRect.bottom), bracketPaint);
+    canvas.drawLine(Offset(ovalRect.left, ovalRect.bottom),
+        Offset(ovalRect.left + bracketLen, ovalRect.bottom), bracketPaint);
     // Bottom-right
-    canvas.drawLine(Offset(ovalRect.right - bracketLen, ovalRect.bottom), Offset(ovalRect.right, ovalRect.bottom), bracketPaint);
-    canvas.drawLine(Offset(ovalRect.right, ovalRect.bottom), Offset(ovalRect.right, ovalRect.bottom - bracketLen), bracketPaint);
+    canvas.drawLine(Offset(ovalRect.right - bracketLen, ovalRect.bottom),
+        Offset(ovalRect.right, ovalRect.bottom), bracketPaint);
+    canvas.drawLine(Offset(ovalRect.right, ovalRect.bottom),
+        Offset(ovalRect.right, ovalRect.bottom - bracketLen), bracketPaint);
 
     // Glowing Animated Radar Sweep Line inside the viewport
     canvas.save();
@@ -115,9 +126,9 @@ class _RadarPainter extends CustomPainter {
     final Paint scanLinePaint = Paint()
       ..shader = LinearGradient(
         colors: [
-          strokeColor.withOpacity(0.0),
+          strokeColor.withValues(alpha: 0.0),
           strokeColor,
-          strokeColor.withOpacity(0.0),
+          strokeColor.withValues(alpha: 0.0),
         ],
       ).createShader(Rect.fromLTWH(ovalRect.left, scanY - 2, ovalRect.width, 4))
       ..strokeWidth = 3.0;
@@ -134,10 +145,11 @@ class _RadarPainter extends CustomPainter {
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          strokeColor.withOpacity(0.25),
+          strokeColor.withValues(alpha: 0.25),
           Colors.transparent,
         ],
-      ).createShader(Rect.fromLTWH(ovalRect.left, scanY - 45, ovalRect.width, 45));
+      ).createShader(
+          Rect.fromLTWH(ovalRect.left, scanY - 45, ovalRect.width, 45));
 
     canvas.drawRect(
       Rect.fromLTWH(ovalRect.left, scanY - 45, ovalRect.width, 45),
@@ -149,6 +161,7 @@ class _RadarPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _RadarPainter oldDelegate) {
-    return oldDelegate.sweepProgress != sweepProgress || oldDelegate.isPassed != isPassed;
+    return oldDelegate.sweepProgress != sweepProgress ||
+        oldDelegate.isPassed != isPassed;
   }
 }
