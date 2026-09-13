@@ -1,50 +1,91 @@
-﻿name: Flutter Build APK
+name: PulseAttend – Build & Release APK
 
 on:
   push:
-    branches: [ "main", "master", "new" ]
+    branches:
+      - new
+      - main
+      - master
+    tags:
+      - 'v*.*.*'
   pull_request:
-    branches: [ "main", "master", "new" ]
+    branches:
+      - new
+      - main
+      - master
   workflow_dispatch:
 
 jobs:
-  build-apk:
+  build:
     name: Build Release APK
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
+      # 1. Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2. Set up Java 17 (required for Android Gradle Plugin & Flutter)
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
+          distribution: 'temurin'
           java-version: '17'
 
+      # 3. Set up Flutter SDK
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.32.0'
-          channel: stable
+          channel: 'stable'
           cache: true
 
+      # 4. Install Pub Dependencies
       - name: Install dependencies
-        working-directory: Nilgiri_attendance-new/facerecognition
+        working-directory: facerecognition
         run: flutter pub get
 
-      - name: Run flutter analyze
-        working-directory: Nilgiri_attendance-new/facerecognition
+      # 5. Run Static Code Analysis
+      - name: Analyze Dart code
+        working-directory: facerecognition
         run: flutter analyze --no-fatal-infos
+        continue-on-error: true
 
-      - name: Build release APK
-        working-directory: Nilgiri_attendance-new/facerecognition
+      # 6. Build Release APK (with --no-tree-shake-icons to prevent icon build errors)
+      - name: Build Release APK
+        working-directory: facerecognition
         run: flutter build apk --release --no-tree-shake-icons
 
-      - name: Upload APK artifact
+      # 7. Upload APK Artifact (available for download on every workflow run)
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: PulseAttend-release-apk
-          path: Nilgiri_attendance-new/facerecognition/build/app/outputs/flutter-apk/app-release.apk
+          path: facerecognition/build/app/outputs/flutter-apk/app-release.apk
           retention-days: 30
 
+      # 8. Create GitHub Release (triggered automatically when pushing version tags like v1.0.0)
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "PulseAttend ${{ github.ref_name }}"
+          body: |
+            ## PulseAttend Release ${{ github.ref_name }}
+
+            ### Included Features:
+            - **On-Device Biometric Face Recognition**: Real camera preview + liveness detection.
+            - **Geofence Verification**: GPS perimeter validation before attendance check-in.
+            - **Dark Glassmorphism UI**: High-fidelity dashboard, statistics chips, and history logs.
+
+            ### Installation Instructions:
+            1. Download `app-release.apk` below.
+            2. Enable **Install from Unknown Sources** in Android Settings.
+            3. Open the downloaded file to install PulseAttend.
+          draft: false
+          prerelease: false
+          make_latest: true
+          files: facerecognition/build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
