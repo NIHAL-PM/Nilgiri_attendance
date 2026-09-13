@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
@@ -12,6 +13,7 @@ from schemas.user import UserRead
 from services.auth_service import AuthService
 from utils.dependencies import get_db, get_current_user
 
+logger = logging.getLogger("pulseattend.auth")
 router = APIRouter(prefix="/auth", tags=["Authentication & Password Reset"])
 
 @router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
@@ -73,25 +75,43 @@ async def get_me(current_user: User = Depends(get_current_user)):
 
 @router.post("/forgot-password")
 async def forgot_password(req: ForgotPasswordRequest, db: AsyncSession = Depends(get_db)):
+    """
+    SECURE PASSWORD RESET REQUEST:
+    - Never returns the reset_token in the API response (prevents unauthorized account takeovers).
+    - Logs token strictly to internal secure server log for administrator out-of-band delivery.
+    - Always returns identical generic response to prevent user enumeration attacks.
+    """
     result = await db.execute(select(User).where(User.email == req.email))
     user = result.scalar_one_or_none()
-    if not user:
-        # Generic response to prevent user enumeration
-        return {"message": "If an account exists with this email, a reset token has been generated."}
-        
-    token, expires = AuthService.generate_reset_token()
-    user.reset_token = token
-    user.reset_token_expires = expires
-    await db.commit()
     
+    if user:
+        token, expires = AuthService.generate_reset_token()
+        user.reset_token = token
+        user.reset_token_expires = expires
+        await db.commit()
+        
+        # Log to secure server console/logs ONLY (never expose via HTTP JSON)
+        logger.info(f"SECURE LOG [Password Reset Token for {user.email}]: {token} (Expires: {expires})")
+        print(f"🔒 [SECURITY LOG] Password Reset Token generated for {user.email}: {token}")
+
+    # Standard generic response (prevents account enumeration & token leakage)
     return {
-        "message": "Password reset token generated successfully.",
-        "reset_token": token,
-        "expires_at": expires.isoformat()
+        "message": "If an account exists with this email address, a password reset token has been dispatched."
     }
 
 @router.post("/reset-password")
 async def reset_password(req: ResetPasswordRequest, db: AsyncSession = Depends(get_db)):
+    """
+    RESETS PASSWORD USING SECURE DISPATCHED TOKEN:
+    - Requires valid non-expired reset token.
+    - Immediately invalidates token upon password update.
+    """
+    if not req.reset_token or len(req.reset_token) < 16:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid password reset token format."
+        )
+
     result = await db.execute(
         select(User).where(User.reset_token == req.reset_token)
     )
