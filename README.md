@@ -1,4 +1,4 @@
-﻿# PulseAttend / VeriFace Event Attendance Platform
+﻿# VeriFace Event Attendance Platform
 
 On-device facial biometric attendance system with client-side embedding generation and server-side Cosine Similarity matching (>= 0.75), with geofencing support and dark fintech aesthetic.
 
