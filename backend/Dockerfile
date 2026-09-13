@@ -7,14 +7,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python requirements
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application source code
+# Copy requirements (handles both root '.' and './backend' Docker build context)
 COPY . .
 
-# Render dynamically sets PORT environment variable
+RUN if [ -f requirements.txt ]; then \
+        pip install --no-cache-dir -r requirements.txt; \
+    elif [ -f backend/requirements.txt ]; then \
+        pip install --no-cache-dir -r backend/requirements.txt; \
+    fi
+
+# If build context was root, move backend files to /app working dir
+RUN if [ -d backend ]; then \
+        cp -r backend/* . ; \
+    fi
+
 ENV PORT=8000
 EXPOSE 8000
 
