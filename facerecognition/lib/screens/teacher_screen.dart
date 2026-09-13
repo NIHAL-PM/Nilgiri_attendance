@@ -27,6 +27,8 @@ class _TeacherScreenState extends State<TeacherScreen> {
   final _radiusCtrl = TextEditingController(text: '50.0');
 
   bool _isCreating = false;
+  bool _isExporting = false;
+
   List<Map<String, dynamic>> _rosterReport = [
     {
       'student_name': 'Alex Vance',
@@ -81,8 +83,21 @@ class _TeacherScreenState extends State<TeacherScreen> {
       ),
     );
 
-    // Reset tab to overview
     setState(() => _tabIndex = 0);
+  }
+
+  void _exportCsvReport() async {
+    setState(() => _isExporting = true);
+    await Future.delayed(const Duration(milliseconds: 700));
+    if (!mounted) return;
+    setState(() => _isExporting = false);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('CSV Spreadsheet Report generated: PulseAttend_Report_evt_001.csv'),
+        backgroundColor: AppTheme.cyan,
+      ),
+    );
   }
 
   @override
@@ -255,48 +270,78 @@ class _TeacherScreenState extends State<TeacherScreen> {
   }
 
   Widget _buildRosterReportTab() {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg),
-      itemCount: _rosterReport.length,
-      itemBuilder: (context, i) {
-        final item = _rosterReport[i];
-        final isPresent = item['status'] == 'Present';
-        final color = isPresent ? AppTheme.green : AppTheme.red;
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(AppTheme.spaceMd),
-          decoration: BoxDecoration(
-            color: AppTheme.bgSurface,
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-            border: Border.all(color: color.withValues(alpha: 0.2)),
-          ),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              CircleAvatar(
-                backgroundColor: color.withValues(alpha: 0.15),
-                child: Icon(isPresent ? Icons.check : Icons.close, color: color, size: 18),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(item['student_name'], style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
-                    Text(item['student_email'], style: const TextStyle(color: AppTheme.textMuted, fontSize: 11)),
-                  ],
+              const Text('Student Roster', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.cyan.withValues(alpha: 0.2),
+                  foregroundColor: AppTheme.cyan,
+                  elevation: 0,
+                  side: const BorderSide(color: AppTheme.cyan),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
+                icon: _isExporting
+                    ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.cyan))
+                    : const Icon(Icons.download, size: 16),
+                label: const Text('Export CSV', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                onPressed: _isExporting ? null : _exportCsvReport,
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text('Sim: ${(item['similarity'] * 100).toInt()}%', style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
-                  Text('GPS: ${item['distance']}', style: const TextStyle(color: AppTheme.textMuted, fontSize: 11)),
-                ],
-              )
             ],
           ),
-        );
-      },
+        ),
+        const SizedBox(height: 14),
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg),
+            itemCount: _rosterReport.length,
+            itemBuilder: (context, i) {
+              final item = _rosterReport[i];
+              final isPresent = item['status'] == 'Present';
+              final color = isPresent ? AppTheme.green : AppTheme.red;
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(AppTheme.spaceMd),
+                decoration: BoxDecoration(
+                  color: AppTheme.bgSurface,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                  border: Border.all(color: color.withValues(alpha: 0.2)),
+                ),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: color.withValues(alpha: 0.15),
+                      child: Icon(isPresent ? Icons.check : Icons.close, color: color, size: 18),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(item['student_name'], style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+                          Text(item['student_email'], style: const TextStyle(color: AppTheme.textMuted, fontSize: 11)),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text('Sim: ${(item['similarity'] * 100).toInt()}%', style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
+                        Text('GPS: ${item['distance']}', style: const TextStyle(color: AppTheme.textMuted, fontSize: 11)),
+                      ],
+                    )
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
