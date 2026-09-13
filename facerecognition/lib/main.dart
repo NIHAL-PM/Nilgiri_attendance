@@ -12,7 +12,7 @@ void main() {
 }
 
 class PulseAttendApp extends StatelessWidget {
-  const PulseAttendApp({Key? key}) : super(key: key);
+  const PulseAttendApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class PulseAttendApp extends StatelessWidget {
 }
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -109,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       padding: const EdgeInsets.symmetric(vertical: 18),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: const Color(0xFF00F2FE).withOpacity(0.5), width: 1.5),
+                        border: Border.all(color: const Color(0xFF00F2FE).withValues(alpha: 0.5), width: 1.5),
                         gradient: const LinearGradient(
                           colors: [Color(0xFF141722), Color(0xFF090A0F)],
                           begin: Alignment.topCenter,
@@ -117,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF00F2FE).withOpacity(0.2),
+                            color: const Color(0xFF00F2FE).withValues(alpha: 0.2),
                             blurRadius: 15,
                             spreadRadius: 2,
                           )
@@ -146,8 +146,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(30),
-                        color: Colors.white.withOpacity(0.05),
-                        border: Border.all(color: Colors.white.withOpacity(0.15)),
+                        color: Colors.white.withValues(alpha: 0.05),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
                       ),
                       child: const Center(
                         child: Text(
@@ -182,10 +182,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         height: 50,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: color.withOpacity(0.1),
-          border: Border.all(color: color.withOpacity(0.5), width: 1.5),
+          color: color.withValues(alpha: 0.1),
+          border: Border.all(color: color.withValues(alpha: 0.5), width: 1.5),
           boxShadow: [
-            BoxShadow(color: color.withOpacity(0.3), blurRadius: 15, spreadRadius: 5)
+            BoxShadow(color: color.withValues(alpha: 0.3), blurRadius: 15, spreadRadius: 5)
           ]
         ),
         child: Icon(icon, color: color, size: 24),
@@ -195,7 +195,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
 }
 
 class RegistrationScreen extends StatefulWidget {
-  const RegistrationScreen({Key? key}) : super(key: key);
+  const RegistrationScreen({super.key});
 
   @override
   State<RegistrationScreen> createState() => _RegistrationScreenState();
@@ -254,9 +254,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
             margin: const EdgeInsets.only(right: 16, top: 12, bottom: 12),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
-              color: const Color(0xFF00F2FE).withOpacity(0.15),
+              color: const Color(0xFF00F2FE).withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFF00F2FE).withOpacity(0.4)),
+              border: Border.all(color: const Color(0xFF00F2FE).withValues(alpha: 0.4)),
             ),
             child: const Center(
               child: Text('Step 1 of 2', style: TextStyle(color: Color(0xFF00F2FE), fontSize: 12, fontWeight: FontWeight.bold)),
@@ -276,8 +276,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
                 decoration: BoxDecoration(
                   color: const Color(0xFF141722),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: _ellipseColor.withOpacity(0.5)),
-                  boxShadow: [BoxShadow(color: _ellipseColor.withOpacity(0.2), blurRadius: 10)]
+                  border: Border.all(color: _ellipseColor.withValues(alpha: 0.5)),
+                  boxShadow: [BoxShadow(color: _ellipseColor.withValues(alpha: 0.2), blurRadius: 10)]
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -302,7 +302,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
                       colors: [Color(0xFF2A2D3E), Colors.black],
                       radius: 1.0,
                     ),
-                    boxShadow: [BoxShadow(color: _ellipseColor.withOpacity(0.3), blurRadius: 25)],
+                    boxShadow: [BoxShadow(color: _ellipseColor.withValues(alpha: 0.3), blurRadius: 25)],
                   ),
                   child: Stack(
                     alignment: Alignment.center,
@@ -371,7 +371,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
 }
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
+  const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -436,9 +436,9 @@ class DashboardScreen extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF141722).withOpacity(0.5),
+                      color: const Color(0xFF141722).withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: Colors.white.withOpacity(0.15), width: 1.5),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.15), width: 1.5),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -472,7 +472,7 @@ class DashboardScreen extends StatelessWidget {
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF00F2FE).withOpacity(0.1),
+                              color: const Color(0xFF00F2FE).withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(color: const Color(0xFF00F2FE)),
                             ),
@@ -529,7 +529,7 @@ class DashboardScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF141722),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.08)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -550,9 +550,9 @@ class DashboardScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF141722).withOpacity(0.6),
+        color: const Color(0xFF141722).withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -564,7 +564,7 @@ class DashboardScreen extends StatelessWidget {
                 height: 40,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFF00FF87).withOpacity(0.1),
+                  color: const Color(0xFF00FF87).withValues(alpha: 0.1),
                 ),
                 child: const Icon(Icons.check_circle_outline, color: Color(0xFF00FF87), size: 22),
               ),
@@ -587,7 +587,7 @@ class DashboardScreen extends StatelessWidget {
 }
 
 class ScannerScreen extends StatefulWidget {
-  const ScannerScreen({Key? key}) : super(key: key);
+  const ScannerScreen({super.key});
 
   @override
   State<ScannerScreen> createState() => _ScannerScreenState();
@@ -636,7 +636,7 @@ class _ScannerScreenState extends State<ScannerScreen> with TickerProviderStateM
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withOpacity(0.8),
+      barrierColor: Colors.black.withValues(alpha: 0.8),
       isDismissible: false,
       builder: (context) {
         return ClipRRect(
@@ -646,8 +646,8 @@ class _ScannerScreenState extends State<ScannerScreen> with TickerProviderStateM
             child: Container(
               padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
-                color: const Color(0xFF141722).withOpacity(0.8),
-                border: Border(top: BorderSide(color: Colors.white.withOpacity(0.1))),
+                color: const Color(0xFF141722).withValues(alpha: 0.8),
+                border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -657,8 +657,8 @@ class _ScannerScreenState extends State<ScannerScreen> with TickerProviderStateM
                     height: 80,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: const Color(0xFF00FF87).withOpacity(0.1),
-                      boxShadow: [BoxShadow(color: const Color(0xFF00FF87).withOpacity(0.3), blurRadius: 20)],
+                      color: const Color(0xFF00FF87).withValues(alpha: 0.1),
+                      boxShadow: [BoxShadow(color: const Color(0xFF00FF87).withValues(alpha: 0.3), blurRadius: 20)],
                     ),
                     child: const Icon(Icons.check_circle, color: Color(0xFF00FF87), size: 50),
                   ),
@@ -700,7 +700,7 @@ class _ScannerScreenState extends State<ScannerScreen> with TickerProviderStateM
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withOpacity(0.8),
+      barrierColor: Colors.black.withValues(alpha: 0.8),
       isDismissible: false,
       builder: (context) {
         return ClipRRect(
@@ -710,8 +710,8 @@ class _ScannerScreenState extends State<ScannerScreen> with TickerProviderStateM
             child: Container(
               padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
-                color: const Color(0xFF141722).withOpacity(0.9),
-                border: Border(top: BorderSide(color: const Color(0xFFFF0844).withOpacity(0.3))),
+                color: const Color(0xFF141722).withValues(alpha: 0.9),
+                border: Border(top: BorderSide(color: const Color(0xFFFF0844).withValues(alpha: 0.3))),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -721,8 +721,8 @@ class _ScannerScreenState extends State<ScannerScreen> with TickerProviderStateM
                     height: 80,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: const Color(0xFFFF0844).withOpacity(0.1),
-                      boxShadow: [BoxShadow(color: const Color(0xFFFF0844).withOpacity(0.3), blurRadius: 20)],
+                      color: const Color(0xFFFF0844).withValues(alpha: 0.1),
+                      boxShadow: [BoxShadow(color: const Color(0xFFFF0844).withValues(alpha: 0.3), blurRadius: 20)],
                     ),
                     child: const Icon(Icons.cancel, color: Color(0xFFFF0844), size: 50),
                   ),
@@ -747,7 +747,7 @@ class _ScannerScreenState extends State<ScannerScreen> with TickerProviderStateM
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFF0844).withOpacity(0.2),
+                              color: const Color(0xFFFF0844).withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(30),
                               border: Border.all(color: const Color(0xFFFF0844)),
                             ),
@@ -764,7 +764,7 @@ class _ScannerScreenState extends State<ScannerScreen> with TickerProviderStateM
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.1),
+                              color: Colors.white.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: const Center(
@@ -835,7 +835,7 @@ class _ScannerScreenState extends State<ScannerScreen> with TickerProviderStateM
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: (_simulateSuccess ? const Color(0xFF00FF87) : const Color(0xFFFF0844)).withOpacity(0.2),
+                      color: (_simulateSuccess ? const Color(0xFF00FF87) : const Color(0xFFFF0844)).withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -875,7 +875,7 @@ class _ScannerScreenState extends State<ScannerScreen> with TickerProviderStateM
 }
 
 class GeofenceScreen extends StatefulWidget {
-  const GeofenceScreen({Key? key}) : super(key: key);
+  const GeofenceScreen({super.key});
 
   @override
   State<GeofenceScreen> createState() => _GeofenceScreenState();
@@ -909,7 +909,7 @@ class _GeofenceScreenState extends State<GeofenceScreen> {
                   decoration: BoxDecoration(
                     color: const Color(0xFF141722),
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
                   ),
                   child: Stack(
                     alignment: Alignment.center,
@@ -926,9 +926,9 @@ class _GeofenceScreenState extends State<GeofenceScreen> {
                         height: 220,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: const Color(0xFF00F2FE).withOpacity(0.1),
+                          color: const Color(0xFF00F2FE).withValues(alpha: 0.1),
                           border: Border.all(color: const Color(0xFF00F2FE), width: 2),
-                          boxShadow: [BoxShadow(color: const Color(0xFF00F2FE).withOpacity(0.2), blurRadius: 20)],
+                          boxShadow: [BoxShadow(color: const Color(0xFF00F2FE).withValues(alpha: 0.2), blurRadius: 20)],
                         ),
                       ),
                       
@@ -958,7 +958,7 @@ class _GeofenceScreenState extends State<GeofenceScreen> {
                 decoration: BoxDecoration(
                   color: const Color(0xFF141722),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.white.withOpacity(0.08)),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
                 ),
                 child: Row(
                   children: [
@@ -1007,9 +1007,9 @@ class _GeofenceScreenState extends State<GeofenceScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
+                        color: Colors.white.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: Colors.white.withOpacity(0.1)),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
                       ),
                       child: const Icon(Icons.swap_horiz, color: Colors.white),
                     ),
@@ -1055,7 +1055,7 @@ class MapGridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.04)
+      ..color = Colors.white.withValues(alpha: 0.04)
       ..strokeWidth = 1.0;
 
     const step = 40.0;
@@ -1080,10 +1080,10 @@ class MapGridPainter extends CustomPainter {
         height: 50,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: color.withOpacity(0.1),
-          border: Border.all(color: color.withOpacity(0.5), width: 1.5),
+          color: color.withValues(alpha: 0.1),
+          border: Border.all(color: color.withValues(alpha: 0.5), width: 1.5),
           boxShadow: [
-            BoxShadow(color: color.withOpacity(0.3), blurRadius: 15, spreadRadius: 5)
+            BoxShadow(color: color.withValues(alpha: 0.3), blurRadius: 15, spreadRadius: 5)
           ]
         ),
         child: Icon(icon, color: color, size: 24),
@@ -1093,7 +1093,7 @@ class MapGridPainter extends CustomPainter {
 }
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
+  const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -1146,9 +1146,9 @@ class DashboardScreen extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF141722).withOpacity(0.5),
+                      color: const Color(0xFF141722).withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: Colors.white.withOpacity(0.15), width: 1.5),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.15), width: 1.5),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1182,7 +1182,7 @@ class DashboardScreen extends StatelessWidget {
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF00F2FE).withOpacity(0.1),
+                              color: const Color(0xFF00F2FE).withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(color: const Color(0xFF00F2FE)),
                             ),
@@ -1205,7 +1205,7 @@ class DashboardScreen extends StatelessWidget {
 }
 
 class ScannerScreen extends StatefulWidget {
-  const ScannerScreen({Key? key}) : super(key: key);
+  const ScannerScreen({super.key});
 
   @override
   State<ScannerScreen> createState() => _ScannerScreenState();
@@ -1249,7 +1249,7 @@ class _ScannerScreenState extends State<ScannerScreen> with TickerProviderStateM
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withOpacity(0.8),
+      barrierColor: Colors.black.withValues(alpha: 0.8),
       isDismissible: false,
       builder: (context) {
         return ClipRRect(
@@ -1259,8 +1259,8 @@ class _ScannerScreenState extends State<ScannerScreen> with TickerProviderStateM
             child: Container(
               padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
-                color: const Color(0xFF141722).withOpacity(0.8),
-                border: Border(top: BorderSide(color: Colors.white.withOpacity(0.1))),
+                color: const Color(0xFF141722).withValues(alpha: 0.8),
+                border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -1270,8 +1270,8 @@ class _ScannerScreenState extends State<ScannerScreen> with TickerProviderStateM
                     height: 80,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: const Color(0xFF00FF87).withOpacity(0.1),
-                      boxShadow: [BoxShadow(color: const Color(0xFF00FF87).withOpacity(0.3), blurRadius: 20)],
+                      color: const Color(0xFF00FF87).withValues(alpha: 0.1),
+                      boxShadow: [BoxShadow(color: const Color(0xFF00FF87).withValues(alpha: 0.3), blurRadius: 20)],
                     ),
                     child: const Icon(Icons.check_circle, color: Color(0xFF00FF87), size: 50),
                   ),
@@ -1389,7 +1389,7 @@ class FaceScannerPainter extends CustomPainter {
 
     // 1. Draw Corner Brackets (Target Face Boundary)
     final bracketPaint = Paint()
-      ..color = Colors.white.withOpacity(0.8)
+      ..color = Colors.white.withValues(alpha: 0.8)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3.0;
 
@@ -1410,7 +1410,7 @@ class FaceScannerPainter extends CustomPainter {
 
     // 2. Mock Facial Landmarks inside the box
     final nodePaint = Paint()..color = Colors.white..style = PaintingStyle.fill;
-    final linePaint = Paint()..color = Colors.white.withOpacity(0.3)..style = PaintingStyle.stroke..strokeWidth = 1.0;
+    final linePaint = Paint()..color = Colors.white.withValues(alpha: 0.3)..style = PaintingStyle.stroke..strokeWidth = 1.0;
     
     final nodes = [
       center + const Offset(-40, -30), // Left Eye
@@ -1432,7 +1432,7 @@ class FaceScannerPainter extends CustomPainter {
 
     for (var node in nodes) {
       canvas.drawCircle(node, 4.0, nodePaint);
-      canvas.drawCircle(node, 10.0, Paint()..color = Colors.white.withOpacity(0.2)..style = PaintingStyle.fill);
+      canvas.drawCircle(node, 10.0, Paint()..color = Colors.white.withValues(alpha: 0.2)..style = PaintingStyle.fill);
     }
 
     // 3. Sweeping Radar Line
@@ -1441,11 +1441,11 @@ class FaceScannerPainter extends CustomPainter {
     final radarPaint = Paint()
       ..shader = LinearGradient(
         colors: [
-          const Color(0xFF00F2FE).withOpacity(0.0),
+          const Color(0xFF00F2FE).withValues(alpha: 0.0),
           const Color(0xFF00F2FE),
           const Color(0xFFFF0844),
           const Color(0xFFFEE140),
-          const Color(0xFFFEE140).withOpacity(0.0),
+          const Color(0xFFFEE140).withValues(alpha: 0.0),
         ],
         stops: const [0.0, 0.2, 0.5, 0.8, 1.0],
       ).createShader(Rect.fromLTWH(rect.left, scanY, rectWidth, 4))
@@ -1456,7 +1456,7 @@ class FaceScannerPainter extends CustomPainter {
     
     // Add glowing shadow behind the line
     canvas.drawLine(Offset(rect.left, scanY), Offset(rect.right, scanY), Paint()
-      ..color = const Color(0xFF00F2FE).withOpacity(0.5)
+      ..color = const Color(0xFF00F2FE).withValues(alpha: 0.5)
       ..strokeWidth = 10.0
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10)
     );
@@ -1480,13 +1480,13 @@ class CircularProgressPainter extends CustomPainter {
 
     // Background Dark Circle
     final bgPaint = Paint()
-      ..color = const Color(0xFF141722).withOpacity(0.8)
+      ..color = const Color(0xFF141722).withValues(alpha: 0.8)
       ..style = PaintingStyle.fill;
     canvas.drawCircle(center, radius, bgPaint);
 
     // Track Ring
     final trackPaint = Paint()
-      ..color = Colors.white.withOpacity(0.1)
+      ..color = Colors.white.withValues(alpha: 0.1)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 4.0;
     canvas.drawCircle(center, radius, trackPaint);
