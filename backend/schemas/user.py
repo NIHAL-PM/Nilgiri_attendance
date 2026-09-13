@@ -1,0 +1,17 @@
+from pydantic import BaseModel, EmailStr, ConfigDict
+
+class UserRead(BaseModel):
+    id: str
+    name: str
+    email: EmailStr
+    avatar_url: str
+    is_verified: bool
+    accuracy_score: float
+    total_events: int
+    present_count: int
+    current_streak: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+class UserBaselineUpload(BaseModel):
+    embedding_vector: list[float]  # 512-dim array from MobileFaceNet
