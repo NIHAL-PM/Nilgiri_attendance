@@ -2,9 +2,9 @@
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ "main", "master", "new" ]
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "main", "master", "new" ]
   workflow_dispatch:
 
 jobs:
@@ -47,3 +47,4 @@ jobs:
           name: PulseAttend-release-apk
           path: Nilgiri_attendance-new/facerecognition/build/app/outputs/flutter-apk/app-release.apk
           retention-days: 30
+
