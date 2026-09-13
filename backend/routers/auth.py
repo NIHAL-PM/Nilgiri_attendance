@@ -14,7 +14,6 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 @router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 async def register(req: RegisterRequest, db: AsyncSession = Depends(get_db)):
-    # Check if email already registered
     result = await db.execute(select(User).where(User.email == req.email))
     if result.scalar_one_or_none():
         raise HTTPException(
@@ -27,6 +26,7 @@ async def register(req: RegisterRequest, db: AsyncSession = Depends(get_db)):
         email=req.email,
         name=req.name,
         hashed_password=hashed_pwd,
+        role=req.role,
     )
     db.add(new_user)
     await db.commit()
@@ -38,7 +38,6 @@ async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: AsyncSession = Depends(get_db)
 ):
-    # Form data login (OAuth2 standard)
     result = await db.execute(select(User).where(User.email == form_data.username))
     user = result.scalar_one_or_none()
     
@@ -49,12 +48,11 @@ async def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
         
-    access_token = AuthService.create_access_token(data={"sub": user.id, "email": user.email})
+    access_token = AuthService.create_access_token(data={"sub": user.id, "email": user.email, "role": user.role})
     return Token(access_token=access_token, token_type="bearer")
 
 @router.post("/login/json", response_model=Token)
 async def login_json(req: LoginRequest, db: AsyncSession = Depends(get_db)):
-    # JSON body login alternative
     result = await db.execute(select(User).where(User.email == req.email))
     user = result.scalar_one_or_none()
     
@@ -64,7 +62,7 @@ async def login_json(req: LoginRequest, db: AsyncSession = Depends(get_db)):
             detail="Incorrect email or password"
         )
         
-    access_token = AuthService.create_access_token(data={"sub": user.id, "email": user.email})
+    access_token = AuthService.create_access_token(data={"sub": user.id, "email": user.email, "role": user.role})
     return Token(access_token=access_token, token_type="bearer")
 
 @router.get("/me", response_model=UserRead)

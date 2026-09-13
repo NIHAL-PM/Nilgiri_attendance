@@ -5,6 +5,7 @@ class UserRead(BaseModel):
     name: str
     email: EmailStr
     avatar_url: str
+    role: str
     is_verified: bool
     accuracy_score: float
     total_events: int

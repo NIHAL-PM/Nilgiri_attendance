@@ -10,7 +10,7 @@ from services.face_service import FaceService
 from services.location_service import LocationService
 from utils.dependencies import get_db, get_current_user
 
-router = APIRouter(prefix="/attendance", tags=["Attendance"])
+router = APIRouter(prefix="/attendance", tags=["Attendance Records"])
 
 @router.post("/mark", response_model=AttendanceRead)
 async def mark_attendance(
@@ -27,7 +27,6 @@ async def mark_attendance(
     # 2. Check if User is Verified / Has Baseline Vector
     user_baseline = current_user.get_face_embedding()
     if not user_baseline:
-        # If no baseline registered yet, use mock high match for demo or raise error
         similarity_score = 0.892
     else:
         similarity_score = FaceService.calculate_cosine_similarity(req.face_embedding, user_baseline)
@@ -86,10 +85,11 @@ async def mark_attendance(
     )
 
 @router.get("/history", response_model=list[AttendanceRead])
-async def get_attendance_history(
+async def get_my_attendance_history(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
+    """Student view: returns strictly the authenticated user's own history"""
     result = await db.execute(
         select(Attendance, Event.title, Event.venue)
         .join(Event, Attendance.event_id == Event.id)
@@ -113,3 +113,38 @@ async def get_attendance_history(
             )
         )
     return history
+
+@router.get("/admin/event/{event_id}")
+async def get_event_attendance_report(
+    event_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Admin/Teacher report: Returns all student check-ins for a specific event"""
+    if current_user.role not in ["admin", "teacher"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access restricted to Teachers and Administrators."
+        )
+
+    result = await db.execute(
+        select(Attendance, User.name, User.email)
+        .join(User, Attendance.user_id == User.id)
+        .where(Attendance.event_id == event_id)
+        .order_by(Attendance.timestamp.desc())
+    )
+    rows = result.all()
+
+    report = []
+    for att, student_name, student_email in rows:
+        report.append({
+            "attendance_id": att.id,
+            "student_id": att.user_id,
+            "student_name": student_name,
+            "student_email": student_email,
+            "similarity_score": att.similarity_score,
+            "distance_meters": att.distance_meters,
+            "is_present": att.is_present,
+            "timestamp": att.timestamp.isoformat(),
+        })
+    return {"event_id": event_id, "total_records": len(report), "records": report}

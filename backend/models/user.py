@@ -14,6 +14,9 @@ class User(Base):
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     avatar_url: Mapped[str] = mapped_column(String(512), default="https://i.pravatar.cc/150?img=33")
     
+    # Role-Based Access Control: 'student' (default), 'teacher', 'admin'
+    role: Mapped[str] = mapped_column(String(50), default="student", nullable=False)
+    
     # Biometric Enrollment
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False)
     face_embedding_json: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON-encoded 512 float array

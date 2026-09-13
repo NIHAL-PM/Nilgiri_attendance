@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
@@ -8,7 +8,16 @@ from schemas.event import EventRead, EventCreate
 from utils.dependencies import get_db, get_current_user
 from models.user import User
 
-router = APIRouter(prefix="/events", tags=["Events"])
+router = APIRouter(prefix="/events", tags=["Events Management"])
+
+@router.get("/", response_model=list[EventRead])
+async def list_all_events(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """List all events (active & past) for event management"""
+    result = await db.execute(select(Event).order_by(Event.start_time.desc()))
+    return result.scalars().all()
 
 @router.get("/active", response_model=EventRead | None)
 async def get_active_event(
@@ -81,8 +90,44 @@ async def create_event(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    """Create a new event (Admins & Teachers)"""
     new_event = Event(**req.model_dump())
     db.add(new_event)
     await db.commit()
     await db.refresh(new_event)
     return new_event
+
+@router.put("/{event_id}", response_model=EventRead)
+async def update_event(
+    event_id: str,
+    req: EventCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Update an existing event or activate/deactivate it"""
+    result = await db.execute(select(Event).where(Event.id == event_id))
+    event = result.scalar_one_or_none()
+    if not event:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
+        
+    for key, value in req.model_dump().items():
+        setattr(event, key, value)
+        
+    await db.commit()
+    await db.refresh(event)
+    return event
+
+@router.delete("/{event_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_event(
+    event_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Delete an event"""
+    result = await db.execute(select(Event).where(Event.id == event_id))
+    event = result.scalar_one_or_none()
+    if not event:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
+        
+    await db.delete(event)
+    await db.commit()
