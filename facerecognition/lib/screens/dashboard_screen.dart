@@ -1,449 +1,547 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:intl/intl.dart';
+import '../app/theme.dart';
+import '../models/user.dart';
+import '../models/event.dart';
+import '../models/attendance_record.dart';
+import '../services/attendance_service.dart';
+import '../widgets/stat_card.dart';
+import '../widgets/event_card.dart';
 import 'scanner_screen.dart';
-import 'painters.dart';
+import 'geofence_screen.dart';
+import 'history_screen.dart';
+import 'profile_screen.dart';
 
-/// The main dashboard shown after successful login or face registration.
-/// Displays the active event hero card, upcoming events, and attendance history.
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
   @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  int _navIndex = 0;
+  final _user = User.demo;
+  List<AttendanceRecord>? _history;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHistory();
+  }
+
+  Future<void> _loadHistory() async {
+    final records = await AttendanceService.instance.getHistory(_user.id);
+    if (!mounted) return;
+    setState(() {
+      _history = records;
+      _loading = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final pages = [
+      _DashboardHome(
+        user: _user,
+        history: _history,
+        loading: _loading,
+        onMarkAttendance: _goToScanner,
+      ),
+      const EventsScreen(),
+      HistoryScreen(records: _history ?? []),
+      ProfileScreen(user: _user),
+    ];
+
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+      backgroundColor: AppTheme.bgDeep,
+      body: pages[_navIndex],
+      bottomNavigationBar: _BottomNav(
+        current: _navIndex,
+        onTap: (i) => setState(() => _navIndex = i),
+      ),
+    );
+  }
+
+  void _goToScanner() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const GeofenceScreen()),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Dashboard Home Tab
+// ---------------------------------------------------------------------------
+
+class _DashboardHome extends StatelessWidget {
+  final User user;
+  final List<AttendanceRecord>? history;
+  final bool loading;
+  final VoidCallback onMarkAttendance;
+
+  const _DashboardHome({
+    required this.user,
+    required this.history,
+    required this.loading,
+    required this.onMarkAttendance,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomScrollView(
+      physics: const BouncingScrollPhysics(),
+      slivers: [
+        // Header
+        SliverToBoxAdapter(child: _Header(user: user).animate().fadeIn()),
+
+        // Stats row
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg),
+          sliver: SliverToBoxAdapter(
+            child: _StatsRow(user: user)
+                .animate(delay: 100.ms)
+                .fadeIn()
+                .slideY(begin: 0.15),
+          ),
+        ),
+
+        const SliverToBoxAdapter(child: SizedBox(height: AppTheme.spaceLg)),
+
+        // Active Event
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg),
+          sliver: SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const _SectionHeader(title: 'Active Event'),
+                const SizedBox(height: AppTheme.spaceMd),
+                HeroEventCard(
+                  event: AttendanceEvent.demoActive,
+                  onMarkAttendance: onMarkAttendance,
+                ),
+              ],
+            ).animate(delay: 200.ms).fadeIn().slideY(begin: 0.15),
+          ),
+        ),
+
+        const SliverToBoxAdapter(child: SizedBox(height: AppTheme.spaceXl)),
+
+        // Upcoming Events
+        SliverToBoxAdapter(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header Profile Bar
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: const Color(0xFF00FF87), width: 2),
-                          image: const DecorationImage(
-                            image: NetworkImage('https://i.pravatar.cc/150?img=33'),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Alex Vance', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                          Text('Identity Verified • 14 Events', style: TextStyle(color: Color(0xFF00FF87), fontSize: 12)),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.location_on_outlined, color: Color(0xFF00F2FE)),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const GeofenceScreen()),
-                          );
-                        },
-                      ),
-                      const Icon(Icons.notifications_outlined, color: Colors.white),
-                    ],
-                  ),
-                ],
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: AppTheme.spaceLg),
+                child: _SectionHeader(title: 'Upcoming Events', action: 'See All'),
               ),
-              const SizedBox(height: 32),
-
-              const Text('Active Event', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 16),
-
-              // Active Event Hero Glassmorphic Card
-              ClipRRect(
-                borderRadius: BorderRadius.circular(24),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                  child: Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF141722).withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.15), width: 1.5),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              width: 10,
-                              height: 10,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Color(0xFF00F2FE),
-                                boxShadow: [BoxShadow(color: Color(0xFF00F2FE), blurRadius: 10)],
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Text(
-                              'HAPPENING NOW',
-                              style: TextStyle(color: Color(0xFF00F2FE), fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.2),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        const Text('Annual Tech Symposium 2026', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'Main Auditorium, Block C\n10:00 AM - 01:00 PM',
-                          style: TextStyle(color: Color(0xFF8E95A5), fontSize: 14, height: 1.5),
-                        ),
-                        const SizedBox(height: 24),
-
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => const ScannerScreen()));
-                          },
-                          child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF00F2FE).withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: const Color(0xFF00F2FE)),
-                            ),
-                            child: const Center(
-                              child: Text(
-                                'Mark Attendance Now',
-                                style: TextStyle(color: Color(0xFF00F2FE), fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 32),
-
-              // Upcoming Events Horizontal Section
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Upcoming Events', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                  Text('See All', style: TextStyle(color: Color(0xFF8E95A5), fontSize: 14)),
-                ],
-              ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppTheme.spaceMd),
               SizedBox(
-                height: 140,
-                child: ListView(
+                height: 148,
+                child: ListView.separated(
                   scrollDirection: Axis.horizontal,
-                  children: [
-                    _buildUpcomingCard('AI & Neural Net Workshop', 'Tomorrow • 02:00 PM', 'Lab 4, Innovation Wing'),
-                    const SizedBox(width: 16),
-                    _buildUpcomingCard('Cybersecurity Hackathon', 'Sep 18 • 09:00 AM', 'Central Seminar Hall'),
-                  ],
+                  padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg),
+                  itemCount: AttendanceEvent.demoUpcoming.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 12),
+                  itemBuilder: (_, i) =>
+                      UpcomingEventCard(event: AttendanceEvent.demoUpcoming[i]),
                 ),
               ),
-              const SizedBox(height: 32),
-
-              // Attendance History Section
-              const Text('Attendance History', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 16),
-              _buildHistoryTile('DevOps & Cloud Masterclass', 'Sep 10, 2026 • 11:30 AM', 'Cosine Similarity: 0.91'),
-              _buildHistoryTile('Orientation & Kickoff 2026', 'Sep 02, 2026 • 09:00 AM', 'Cosine Similarity: 0.88'),
             ],
+          ).animate(delay: 300.ms).fadeIn(),
+        ),
+
+        const SliverToBoxAdapter(child: SizedBox(height: AppTheme.spaceXl)),
+
+        // Recent Attendance
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg),
+          sliver: SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const _SectionHeader(title: 'Recent Attendance', action: 'All'),
+                const SizedBox(height: AppTheme.spaceMd),
+                loading
+                    ? _ShimmerList()
+                    : Column(
+                        children: (history ?? [])
+                            .take(3)
+                            .map((r) => _HistoryTile(record: r))
+                            .toList(),
+                      ),
+              ],
+            ).animate(delay: 400.ms).fadeIn(),
           ),
         ),
-      ),
-    );
-  }
 
-  Widget _buildUpcomingCard(String title, String time, String location) {
-    return Container(
-      width: 240,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: const Color(0xFF141722),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 8),
-          Text(time, style: const TextStyle(color: Color(0xFF00F2FE), fontSize: 12, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 4),
-          Text(location, style: const TextStyle(color: Color(0xFF8E95A5), fontSize: 12)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHistoryTile(String title, String timestamp, String score) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF141722).withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0xFF00FF87).withValues(alpha: 0.1),
-                ),
-                child: const Icon(Icons.check_circle_outline, color: Color(0xFF00FF87), size: 22),
-              ),
-              const SizedBox(width: 14),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 4),
-                  Text(timestamp, style: const TextStyle(color: Color(0xFF8E95A5), fontSize: 12)),
-                ],
-              ),
-            ],
-          ),
-          Text(score, style: const TextStyle(color: Color(0xFF00FF87), fontSize: 11, fontWeight: FontWeight.bold)),
-        ],
-      ),
+        const SliverToBoxAdapter(child: SizedBox(height: 100)),
+      ],
     );
   }
 }
 
-/// Shows the geofence proximity map and allows the user to proceed
-/// to the scanner only when inside the event zone.
-class GeofenceScreen extends StatefulWidget {
-  const GeofenceScreen({super.key});
+// ---------------------------------------------------------------------------
+// Header
+// ---------------------------------------------------------------------------
 
-  @override
-  State<GeofenceScreen> createState() => _GeofenceScreenState();
-}
-
-class _GeofenceScreenState extends State<GeofenceScreen> {
-  bool _isInsideZone = true;
+class _Header extends StatelessWidget {
+  final User user;
+  const _Header({required this.user});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF090A0F),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text('📍 Geofence Check', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
-          onPressed: () => Navigator.pop(context),
+    final hour = DateTime.now().hour;
+    final greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+
+    return Container(
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top + 16,
+        left: AppTheme.spaceLg,
+        right: AppTheme.spaceLg,
+        bottom: AppTheme.spaceLg,
+      ),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppTheme.bgSurface.withValues(alpha: 0.8), Colors.transparent],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
+      child: Row(
+        children: [
+          // Avatar with verified ring
+          Stack(
             children: [
-              // Simulated Vector Map
-              Expanded(
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF141722),
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-                  ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // Grid map lines
-                      CustomPaint(
-                        painter: MapGridPainter(),
-                        size: Size.infinite,
-                      ),
-
-                      // 50m radius geofence circle
-                      Container(
-                        width: 220,
-                        height: 220,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: const Color(0xFF00F2FE).withValues(alpha: 0.1),
-                          border: Border.all(color: const Color(0xFF00F2FE), width: 2),
-                          boxShadow: [
-                            BoxShadow(color: const Color(0xFF00F2FE).withValues(alpha: 0.2), blurRadius: 20),
-                          ],
-                        ),
-                      ),
-
-                      // User location dot
-                      AnimatedAlign(
-                        duration: const Duration(milliseconds: 500),
-                        alignment: _isInsideZone ? Alignment.center : const Alignment(0.7, 0.7),
-                        child: Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: _isInsideZone ? const Color(0xFF00FF87) : const Color(0xFFFF0844),
-                            boxShadow: [
-                              BoxShadow(
-                                color: _isInsideZone ? const Color(0xFF00FF87) : const Color(0xFFFF0844),
-                                blurRadius: 10,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Distance & zone information card
               Container(
-                padding: const EdgeInsets.all(20),
+                width: 52, height: 52,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF141722),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                  shape: BoxShape.circle,
+                  gradient: AppTheme.cyanGradient,
+                  boxShadow: [BoxShadow(
+                      color: AppTheme.cyan.withValues(alpha: 0.4), blurRadius: 12)],
                 ),
-                child: Row(
-                  children: [
-                    Icon(
-                      _isInsideZone ? Icons.verified_user_outlined : Icons.gpp_bad_outlined,
-                      color: _isInsideZone ? const Color(0xFF00FF87) : const Color(0xFFFF0844),
-                      size: 32,
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _isInsideZone ? 'Inside Zone (12m away)' : 'Outside Zone (120m away)',
-                            style: TextStyle(
-                              color: _isInsideZone ? const Color(0xFF00FF87) : const Color(0xFFFF0844),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            _isInsideZone
-                                ? 'You are within the 50m radius of Main Auditorium.'
-                                : 'Move closer to the event venue to unlock check-in.',
-                            style: const TextStyle(color: Color(0xFF8E95A5), fontSize: 13),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                padding: const EdgeInsets.all(2.5),
+                child: CircleAvatar(
+                  backgroundImage: NetworkImage(user.avatarUrl),
                 ),
               ),
-              const SizedBox(height: 16),
-
-              // Toggle zone simulation + proceed button
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _isInsideZone = !_isInsideZone;
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-                      ),
-                      child: const Icon(Icons.swap_horiz, color: Colors.white),
+              if (user.isVerified)
+                Positioned(
+                  right: 0, bottom: 0,
+                  child: Container(
+                    width: 18, height: 18,
+                    decoration: BoxDecoration(
+                      color: AppTheme.green, shape: BoxShape.circle,
+                      border: Border.all(color: AppTheme.bgDeep, width: 2),
                     ),
+                    child: const Icon(Icons.check, color: Colors.black, size: 10),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: _isInsideZone
-                          ? () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (context) => const ScannerScreen()),
-                              );
-                            }
-                          : null,
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        padding: const EdgeInsets.symmetric(vertical: 18),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          color: _isInsideZone ? const Color(0xFF00F2FE) : const Color(0xFF141722),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Proceed to Camera Scan',
-                            style: TextStyle(
-                              color: _isInsideZone ? Colors.black : const Color(0xFF8E95A5),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
             ],
           ),
-        ),
+
+          const SizedBox(width: 14),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('$greeting,', style: const TextStyle(
+                    color: AppTheme.textSub, fontSize: 13)),
+                Text(user.name, style: const TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+
+          // Notification bell
+          Container(
+            width: 42, height: 42,
+            decoration: BoxDecoration(
+              color: AppTheme.bgSurface,
+              shape: BoxShape.circle,
+              border: Border.all(color: AppTheme.border),
+            ),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                const Icon(Icons.notifications_outlined,
+                    color: AppTheme.textPrimary, size: 22),
+                Positioned(
+                  top: 8, right: 8,
+                  child: Container(
+                    width: 8, height: 8,
+                    decoration: const BoxDecoration(
+                        color: AppTheme.red, shape: BoxShape.circle),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-/// Draws a subtle grid over the geofence map background.
-class MapGridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.04)
-      ..strokeWidth = 1.0;
+// ---------------------------------------------------------------------------
+// Stats Row
+// ---------------------------------------------------------------------------
 
-    const step = 40.0;
-    for (double x = 0; x < size.width; x += step) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
-    }
-    for (double y = 0; y < size.height; y += step) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
+class _StatsRow extends StatelessWidget {
+  final User user;
+  const _StatsRow({required this.user});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(child: StatCard(
+          value: '${user.totalEvents}',
+          label: 'Total Events',
+          icon: Icons.event_outlined,
+          color: AppTheme.cyan,
+          small: true,
+        )),
+        const SizedBox(width: 10),
+        Expanded(child: StatCard(
+          value: '${user.presentCount}',
+          label: 'Present',
+          icon: Icons.check_circle_outline,
+          color: AppTheme.green,
+          small: true,
+        )),
+        const SizedBox(width: 10),
+        Expanded(child: StatCard(
+          value: '${user.absentCount}',
+          label: 'Absent',
+          icon: Icons.cancel_outlined,
+          color: AppTheme.red,
+          small: true,
+        )),
+        const SizedBox(width: 10),
+        Expanded(child: StatCard(
+          value: '${user.currentStreak}d',
+          label: 'Streak',
+          icon: Icons.local_fire_department_outlined,
+          color: AppTheme.gold,
+          small: true,
+        )),
+      ],
+    );
   }
+}
+
+// ---------------------------------------------------------------------------
+// History tile
+// ---------------------------------------------------------------------------
+
+class _HistoryTile extends StatelessWidget {
+  final AttendanceRecord record;
+  const _HistoryTile({required this.record});
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  Widget build(BuildContext context) {
+    final color = record.isPresent ? AppTheme.green : AppTheme.red;
+    final fmt = DateFormat('MMM d, yyyy • hh:mm a');
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(AppTheme.spaceMd),
+      decoration: BoxDecoration(
+        color: AppTheme.bgSurface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: color.withValues(alpha: 0.15)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40, height: 40,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              record.isPresent ? Icons.check_circle_outline : Icons.cancel_outlined,
+              color: color, size: 22,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(record.eventTitle, style: const TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600),
+                  maxLines: 1, overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 2),
+                Text(fmt.format(record.timestamp), style: const TextStyle(
+                    color: AppTheme.textMuted, fontSize: 11)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+            ),
+            child: Text(
+              '${(record.similarityScore * 100).toInt()}%',
+              style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Shimmer placeholder
+// ---------------------------------------------------------------------------
+
+class _ShimmerList extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: AppTheme.bgSurface,
+      highlightColor: AppTheme.bgCard,
+      child: Column(
+        children: List.generate(3, (_) => Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          height: 68,
+          decoration: BoxDecoration(
+            color: AppTheme.bgSurface,
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          ),
+        )),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Events placeholder screen (Tab 2)
+// ---------------------------------------------------------------------------
+
+class EventsScreen extends StatelessWidget {
+  const EventsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.all(AppTheme.spaceLg),
+            sliver: SliverToBoxAdapter(
+              child: Text('Events', style: Theme.of(context).textTheme.headlineLarge),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (_, i) {
+                  final e = AttendanceEvent.demoUpcoming[i];
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 14),
+                    child: UpcomingEventCard(event: e),
+                  );
+                },
+                childCount: AttendanceEvent.demoUpcoming.length,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Shared helpers
+// ---------------------------------------------------------------------------
+
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  final String? action;
+  const _SectionHeader({required this.title, this.action});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(title, style: Theme.of(context).textTheme.headlineSmall),
+        if (action != null)
+          Text(action!, style: const TextStyle(
+              color: AppTheme.cyan, fontSize: 13, fontWeight: FontWeight.w600)),
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Bottom navigation
+// ---------------------------------------------------------------------------
+
+class _BottomNav extends StatelessWidget {
+  final int current;
+  final ValueChanged<int> onTap;
+  const _BottomNav({required this.current, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.bgSurface,
+        border: Border(top: BorderSide(color: AppTheme.border, width: 1)),
+      ),
+      child: SafeArea(
+        child: BottomNavigationBar(
+          currentIndex: current,
+          onTap: onTap,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard_outlined),
+              activeIcon: Icon(Icons.dashboard),
+              label: 'Dashboard',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.event_outlined),
+              activeIcon: Icon(Icons.event),
+              label: 'Events',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.history_outlined),
+              activeIcon: Icon(Icons.history),
+              label: 'History',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              activeIcon: Icon(Icons.person),
+              label: 'Profile',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
