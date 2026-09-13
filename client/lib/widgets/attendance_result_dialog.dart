@@ -102,7 +102,7 @@ class AttendanceResultDialog extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '%',
+                        '${(result.similarityScore * 100).toStringAsFixed(1)}%',
                         style: TextStyle(
                           color: primaryColor,
                           fontSize: 20,

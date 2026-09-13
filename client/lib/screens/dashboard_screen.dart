@@ -58,9 +58,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   fontSize: 17,
                   fontWeight: FontWeight.bold),
             ),
-            const Text(
-              'ID:  • Verified Biometric',
-              style: TextStyle(color: Color(0xFF05FFA1), fontSize: 12),
+            Text(
+              'ID: ${widget.user.studentId} • Verified Biometric',
+              style: const TextStyle(color: Color(0xFF05FFA1), fontSize: 12),
             ),
           ],
         ),
